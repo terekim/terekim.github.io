@@ -20,6 +20,6 @@ p {
 .container__greeting {
   align-items: center;
   display: flex;
-  height: 96vh;
+  height: 92vh;
   justify-content: center;
 }
