@@ -2,7 +2,6 @@ body {
   background-color: #010101;
   color: #fefefe;
   font-family: 'Crimson Pro', 'serif';
-  font-size: 3vh;
   font-weight: lighter;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -14,6 +13,7 @@ a {
 }
 
 p {
+  font-size: 3vmin;
   line-height: 1.3;
 }
 
