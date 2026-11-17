@@ -81,6 +81,27 @@ svg.defs{position:absolute;width:0;height:0}
 .chart{display:block;width:100%;height:60px;margin-top:6px}
 .foot{text-align:center;font-size:12px;font-weight:600;color:var(--ink2);line-height:1.6}
 
+
+.hbar{display:flex;align-items:center;gap:8px}
+.hlogo{flex:1;white-space:nowrap;font-family:var(--head);font-size:clamp(20px,6.4vw,30px);line-height:.9;text-transform:uppercase;color:var(--brick);-webkit-text-stroke:1.4px var(--ink);text-shadow:2px 2px 0 var(--ink);transform:rotate(-2deg);transform-origin:left;filter:url(#roughT)}
+.daily{padding:14px 14px 16px;display:flex;flex-direction:column;gap:14px}
+.dhead{display:flex;align-items:flex-end;justify-content:space-between}
+.dtitle{white-space:nowrap;font-family:var(--head);font-size:clamp(24px,7.6vw,34px);line-height:.95;text-transform:uppercase}
+.dstate{font-family:var(--head);font-size:14px;color:var(--teal);border:3px solid var(--teal);padding:2px 8px;transform:rotate(4deg);filter:url(#rough)}
+.dstate.done{color:var(--brick);border-color:var(--brick)}
+.grid{position:relative;background:radial-gradient(rgba(33,28,24,.14) 1px,transparent 1.3px) 0 0/6px 6px,var(--paper2);margin-inline:-2px}
+.grid::after{content:"";position:absolute;inset:0;border:3px solid var(--ink);filter:url(#rough);pointer-events:none}
+.grid .gl{position:relative;height:40px;border-bottom:2px dashed rgba(33,28,24,.22);display:flex;align-items:flex-end}
+.grid .gl:last-child{border-bottom:0}
+.grid .gl.me{background:rgba(217,169,58,.3)}
+.grid .gl img{height:48px;width:auto;margin-left:6px;margin-bottom:-2px;position:relative;z-index:1}
+.grid .gl span{position:absolute;right:24px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:800;text-transform:uppercase;color:var(--ink2)}
+.grid .gl.me span{color:var(--ink)}
+.grid .startline{position:absolute;left:78px;top:0;bottom:0;border-left:3px solid var(--ink);opacity:.5}
+.grid .finline{position:absolute;right:6px;top:0;bottom:0;width:10px;background:conic-gradient(var(--ink) 25%,var(--card) 0 50%,var(--ink) 0 75%,var(--card) 0) 0 0/10px 10px}
+.drule{font-size:13px;font-weight:600;color:var(--ink2);text-align:center;line-height:1.4}
+.today{display:flex;align-items:center;gap:12px}
+
 /* ---------- race ---------- */
 #race{flex:1;display:flex;flex-direction:column;gap:9px;padding:calc(env(safe-area-inset-top) + 8px) max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));min-height:0}
 #race>.rtop,#race>#track{flex:none}
@@ -186,24 +207,26 @@ svg.defs{position:absolute;width:0;height:0}
 <div id="app">
 
 <section id="home">
-  <div class="topbar">
+  <header class="hbar">
+    <div class="hlogo">Thumb Rally</div>
     <div class="chip" title="Day streak"><svg viewBox="0 0 24 24"><path d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-6 0 2 1 3 2 3 0-4-1-6 1-9Z" fill="#B23F2C" stroke="#211C18" stroke-width="2"/></svg><span id="hStreak">0</span></div>
-    <div class="spacer"></div>
     <div class="chip" title="Personal best"><span id="hBest">0</span>&nbsp;wpm</div>
-  </div>
-  <div class="mast"><div class="logo">Thumb Rally</div><div class="rule"><span id="mIssue">No. 1</span><span>The daily typing derby</span><span id="mDate"></span></div></div>
-  <div class="hero"><img src="img/gang.jpg" alt="The gang sprinting in a chaotic pack"><span class="cap">Meanwhile, at the track…</span></div>
-  <div>
-    <div class="sect"><span class="lbl" id="dLabel">Today's track</span><span class="lbl" id="dSub">Same track for everyone</span></div>
+  </header>
+
+  <div class="daily panel inked">
+    <div class="dhead"><div><div class="lbl" id="dDate">Today</div><div class="dtitle" id="dTitle">Track No. 1</div></div><span class="dstate" id="dState">Open</span></div>
+    <div class="grid" id="grid"></div>
     <div id="dailyCta"></div>
+    <p class="drule" id="dRule">Type the passage. Beat the gang. One official run a day, same track for everyone.</p>
   </div>
+
   <div>
-    <div class="sect"><span class="lbl">Pick your driver</span><span class="lbl" id="pickName"></span></div>
+    <div class="sect"><span class="lbl">Your driver</span><span class="lbl" id="pickName"></span></div>
     <div class="picker" id="picker"></div>
   </div>
   <button class="btn alt" id="bPractice">Practice race</button>
   <div class="panel inked"><div class="stats"><div><b id="kRaces">0</b><span class="lbl">Races</span></div><div><b id="kWins">0</b><span class="lbl">Wins</span></div><div><b id="kAvg">0</b><span class="lbl">Avg</span></div><div><b id="kBest">0</b><span class="lbl">Best</span></div></div><svg class="chart" id="chart" viewBox="0 0 300 60" preserveAspectRatio="none"></svg></div>
-  <p class="foot">New track every day · @thumbrally</p>
+  <p class="foot">New track every day at midnight · @thumbrally</p>
 </section>
 
 <section id="race" class="hidden">
@@ -455,13 +478,17 @@ $('#bReplay').onclick=async()=>{if(!R||!R.card||!R.card.trail||R.card.trail.leng
 function renderHome(){
   $('#hStreak').textContent=liveStreak();$('#hBest').textContent=S.best;
   $('#kRaces').textContent=S.races;$('#kWins').textContent=S.wins;$('#kAvg').textContent=Math.round(avg(10));$('#kBest').textContent=S.best;
-  const d=new Date();$('#mIssue').textContent='No. '+dayNum();$('#mDate').textContent=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-  $('#dLabel').textContent=`Track no. ${dayNum()}`;
-  const td=todayDaily();
-  if(td){$('#dSub').textContent='Next track in '+untilTomorrow();
-    $('#dailyCta').innerHTML=`<div class="panel inked today"><img src="${kartSrc(td.driver||S.driver)}" alt=""><div><div class="big">${td.place}${sfx(td.place)} · ${td.wpm} wpm</div><div class="sub">Today's official run is in. Practice all you want.</div></div></div>`}
-  else{$('#dSub').textContent='Same track for everyone';
-    $('#dailyCta').innerHTML=`<button class="btn go" id="bDaily"><span class="col">Race today's track<small>One official run · about 60 seconds</small></span></button>`;$('#bDaily').onclick=()=>startRace('daily')}
+  const d=new Date();$('#dDate').textContent=d.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
+  $('#dTitle').textContent=`Track No. ${dayNum()}`;
+  const order=[S.driver,...IDS.filter(i=>i!==S.driver)];
+  $('#grid').innerHTML='<i class="startline"></i><i class="finline"></i>'+order.map((id,i)=>`<div class="gl${i?'':' me'}"><img src="${kartSrc(id)}" alt="${GANG[id].name}"><span>${i?GANG[id].name:'You'}</span></div>`).join('');
+  const td=todayDaily(),st=$('#dState');
+  if(td){st.textContent='Done';st.classList.add('done');
+    $('#dailyCta').innerHTML=`<div class="today"><div><div class="dtitle" style="font-size:30px">${td.place}${sfx(td.place)} · ${td.wpm} wpm</div><div class="lbl" style="margin-top:4px">${td.acc}% accuracy</div></div></div>`;
+    $('#dRule').textContent='Next track in '+untilTomorrow()+'. Practice all you want until then.'}
+  else{st.textContent='Open';st.classList.remove('done');
+    $('#dailyCta').innerHTML=`<button class="btn go" id="bDaily">Race today's track</button>`;$('#bDaily').onclick=()=>startRace('daily');
+    $('#dRule').textContent='Type the passage. Beat the gang. One official run a day, same track for everyone.'}
   $('#picker').innerHTML=IDS.map(id=>`<button class="pick${id===S.driver?' on':''}" data-id="${id}" aria-pressed="${id===S.driver}"><img src="${kartSrc(id)}" alt=""><span>${GANG[id].name.replace('Sir Ringsley','Sir R.').replace('Pops Pointer','Pops')}</span></button>`).join('');
   $('#pickName').textContent=GANG[S.driver].name;
   document.querySelectorAll('.pick').forEach(b=>b.onclick=()=>{S.driver=b.dataset.id;save();renderHome();beep(700,.06,.03)});
