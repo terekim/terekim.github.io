@@ -84,9 +84,9 @@ svg.defs{position:absolute;width:0;height:0}
 .stats b{display:block;font-family:var(--head);font-weight:400;font-size:24px;line-height:1.1}
 [data-look="clean"] .stats b{font-family:var(--font);font-weight:800}
 .gangrow{padding:12px 8px 8px}
-.gangrow .row{display:flex;justify-content:space-around;align-items:flex-end;height:96px}
-.gangrow .row .who{display:flex;flex-direction:column;align-items:center;gap:2px;width:20%}
-.gangrow .row .who .spr{width:58px;height:64px}
+.gangrow .row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 4px;justify-items:center}
+.gangrow .row .who{display:flex;flex-direction:column;align-items:center;gap:2px}
+.gangrow .row .who .racer{width:68px;height:64px}
 .gangrow .row .who span{font-size:10px;font-weight:800;white-space:nowrap;text-transform:var(--label-case)}
 .looks{display:flex;gap:6px}
 .looks button{flex:1;padding:10px;font-weight:800;font-size:14px;border:var(--bw) solid var(--line);border-radius:var(--radius);background:var(--surface)}
@@ -116,6 +116,29 @@ svg.defs{position:absolute;width:0;height:0}
 [data-look="comic"] .spr.static{filter:url(#roughS)}
 @media (prefers-reduced-motion:reduce){.spr *{animation:none!important}.spr{animation:none!important}}
 
+/* ---------- karts ---------- */
+.racer{overflow:visible}
+.racer .wheel,.racer .chassis,.racer .driver,.racer .dust,.racer .shake,.racer .tremble,.racer .cheer,.racer .cheer2{transform-box:view-box}
+.racer .dust,.racer .lines{opacity:0}
+.racer.run .wheel{animation:spin .22s linear infinite}
+.racer.run .chassis{animation:bump .12s ease-in-out infinite alternate}
+.racer.run .dust{opacity:1;animation:puff .45s ease-out infinite}
+.racer.run .lines{opacity:1;animation:streak .3s linear infinite}
+.racer.idle .driver{animation:bob 1.3s ease-in-out infinite alternate}
+.racer .shake{animation:shake .35s ease-in-out infinite alternate}
+.racer .tremble{animation:tremble .09s linear infinite alternate}
+.racer .cheer{animation:cheerL .4s ease-in-out infinite alternate}
+.racer .cheer2{animation:cheerR .4s ease-in-out infinite alternate}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes bump{from{transform:translateY(0)}to{transform:translateY(-1.6px)}}
+@keyframes puff{from{transform:translateX(6px) scale(.6)}to{transform:translateX(-6px) scale(1.15);opacity:0}}
+@keyframes streak{from{transform:translateX(4px)}to{transform:translateX(-6px);opacity:.2}}
+@keyframes shake{from{transform:rotate(-8deg)}to{transform:rotate(10deg)}}
+@keyframes tremble{from{transform:translateX(-.6px)}to{transform:translateX(.6px)}}
+@keyframes cheerL{from{transform:rotate(-10deg)}to{transform:rotate(12deg)}}
+@keyframes cheerR{from{transform:rotate(10deg)}to{transform:rotate(-12deg)}}
+@media (prefers-reduced-motion:reduce){.racer *{animation:none!important}}
+
 /* ---------- race ---------- */
 #race{flex:1;display:flex;flex-direction:column;gap:8px;padding:calc(env(safe-area-inset-top) + 8px) max(12px,env(safe-area-inset-left)) 8px max(12px,env(safe-area-inset-right));min-height:0}
 .rtop{display:flex;align-items:center;gap:8px}
@@ -128,12 +151,12 @@ svg.defs{position:absolute;width:0;height:0}
 [data-look="comic"] #track{border:0}
 [data-look="comic"] #track::after{content:"";position:absolute;inset:0;border:3px solid var(--ink);filter:url(#rough);pointer-events:none}
 [data-look="comic"] #track{background:radial-gradient(rgba(33,28,24,.16) 1px,transparent 1.3px) 0 0/6px 6px,var(--track)}
-.lane{position:relative;height:38px;border-bottom:2px dashed var(--lane)}
+.lane{position:relative;height:52px;border-bottom:2px dashed var(--lane)}
 .lane:last-child{border-bottom:0}
 .lane .nm{position:absolute;right:22px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:800;color:var(--muted);text-transform:var(--label-case);white-space:nowrap}
 .lane.me .nm{color:var(--text)}
-.runner{position:absolute;left:2px;bottom:1px;width:34px;height:38px;will-change:transform}
-.runner .spr{width:34px;height:38px}
+.runner{position:absolute;left:0;bottom:-2px;width:60px;height:56px;will-change:transform}
+.runner .racer{width:60px;height:56px;display:block}
 .fin{position:absolute;right:6px;top:0;bottom:0;width:9px;background:conic-gradient(var(--ink) 25%,#fff 0 50%,var(--ink) 0 75%,#fff 0) 0 0/9px 9px;opacity:.8}
 #count{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--head);font-size:70px;color:var(--brick);background:color-mix(in srgb,var(--bg) 70%,transparent);pointer-events:none}
 [data-look="comic"] #count{-webkit-text-stroke:2px var(--ink);text-shadow:3px 3px 0 var(--ink)}
@@ -171,7 +194,7 @@ svg.defs{position:absolute;width:0;height:0}
 .rgrid b{display:block;font-weight:800;font-size:20px}
 .board{padding:12px 14px;display:flex;flex-direction:column;gap:8px}
 .brow{display:flex;align-items:center;gap:10px;font-weight:800;font-size:15px}
-.brow .spr{width:26px;height:30px;flex:none}
+.brow .racer{width:36px;height:34px;flex:none}
 .brow .n{width:22px;font-family:var(--head);font-weight:400;color:var(--muted)}
 .brow .w{margin-left:auto;color:var(--muted);font-variant-numeric:tabular-nums}
 .brow.me{color:var(--brick)}
@@ -243,6 +266,7 @@ svg.defs{position:absolute;width:0;height:0}
   <button class="btn" id="bHome">Home</button>
 </div>
 
+<script src="gang.js"></script>
 <script>
 (()=>{
 const $=s=>document.querySelector(s);
@@ -254,56 +278,11 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const qLook=new URLSearchParams(location.search).get('look');if(qLook==='clean'||qLook==='comic')S.look=qLook;
 document.body.dataset.look=S.look;
 
-// ---------- the gang ----------
-const INK='#211C18',CREAM='#FBF1DD';
-const hose=(d,c,w=5)=>`<path d="${d}" fill="none" stroke="${INK}" stroke-width="${w+4}" stroke-linecap="round"/><path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round"/>`;
-const glove=(x,y)=>`<circle cx="${x}" cy="${y}" r="5.6" fill="${CREAM}" stroke="${INK}" stroke-width="2.2"/><circle cx="${x-3.6}" cy="${y-3.2}" r="2.7" fill="${CREAM}" stroke="${INK}" stroke-width="1.8"/><path d="M${x+1} ${y-1.5} v3" stroke="${INK}" stroke-width="1"/>`;
-const shoe=(x,y,c)=>`<g transform="translate(${x} ${y}) scale(1.45)"><path d="M-6 6 q-1.5 -7.5 4.5 -8.5 q5 -.5 7 2.5 q6.5 1 7.5 5.5 v2z" fill="${c}" stroke="${INK}" stroke-width="1.6" stroke-linejoin="round"/><path d="M5.5 2 q5.5 1 6.5 4.5 v1 h-6.5z" fill="${CREAM}" stroke="${INK}" stroke-width="1.2"/><path d="M-7 7.6 h20.5" stroke="${INK}" stroke-width="2.4" stroke-linecap="round"/><path d="M-1.5 -.5 l2.5 1.6 M1 -1.4 l2.5 1.6" stroke="${CREAM}" stroke-width="1"/></g>`;
-const leg=(cls,hx,hy,len,c,sc)=>`<g class="${cls}" style="transform-origin:${hx}px ${hy}px">${hose(`M${hx} ${hy} Q${hx-4} ${hy+len*.55} ${hx} ${hy+len}`,c)}${shoe(hx,hy+len,sc)}</g>`;
-const arm=(cls,sx,sy,dir,c,len=13)=>{const ex=sx+dir*len,ey=sy+9;return `<g class="${cls}" style="transform-origin:${sx}px ${sy}px">${hose(`M${sx} ${sy} Q${sx+dir*(len*.8)} ${sy-3} ${ex} ${ey}`,c,4.4)}${glove(ex,ey)}</g>`};
-const tone=(path,c)=>`<path d="${path}" fill="${c}" stroke="${INK}" stroke-width="2.6"/><g clip-path="url(#rhalf)"><path d="${path}" fill="url(#ht)" opacity=".5"/></g>`;
-const GANG={
- thumbs:{name:'Thumbs',color:'#E58D90',draw(){const c=this.color,B='M28 62 Q28 36 50 36 Q72 36 72 62 Q72 86 50 86 Q28 86 28 62Z';
-  return {back:leg('lb',43,82,15,c,'#B23F2C')+arm('ab',31,73,-1,c),front:leg('lf',57,82,15,c,'#B23F2C')+arm('af',69,73,1,c),
-  bod:tone(B,c)+`<path d="M25 58 Q24 31 50 30 Q76 31 75 58 Q63 51 50 51 Q37 51 25 58Z" fill="#B23F2C"/><path d="M45 30.5 h10 v21 h-10z" fill="#EADBC0" opacity=".9"/><path d="M25 58 Q24 31 50 30 Q76 31 75 58 Q63 51 50 51 Q37 51 25 58Z" fill="none" stroke="${INK}" stroke-width="2.6"/><path d="M26 57 Q38 50 50 50 Q62 50 74 57" fill="none" stroke="#5A2A1E" stroke-width="3.5"/>${[31,40,60,69].map((x,i)=>`<circle cx="${x}" cy="${[54,51,51,54][i]}" r="1.6" fill="#DDD3C2" stroke="${INK}" stroke-width=".8"/>`).join('')}<path d="M40 38 l3 -3 M60 40 l2 -2" stroke="#EADBC0" stroke-width="1.4" opacity=".7"/>
-  <path d="M35 58 L47 63" stroke="${INK}" stroke-width="3.6" stroke-linecap="round"/><path d="M65 58 L53 63" stroke="${INK}" stroke-width="3.6" stroke-linecap="round"/>
-  <ellipse cx="42" cy="65" rx="5" ry="3.8" fill="${CREAM}" stroke="${INK}" stroke-width="1.8"/><ellipse cx="58" cy="65" rx="5" ry="3.8" fill="${CREAM}" stroke="${INK}" stroke-width="1.8"/><circle cx="43.6" cy="65.6" r="2" fill="${INK}"/><circle cx="56.4" cy="65.6" r="2" fill="${INK}"/>
-  <path d="M36 72 Q50 84 65 71 Q50 77 36 72Z" fill="${CREAM}" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/><path d="M39 74 Q50 79 62 73" fill="none" stroke="${INK}" stroke-width="1"/><path d="M59 75 q9 1 14 -4 q0 7 -10 9 q-4 0 -5 -3z" fill="#E66F79" stroke="${INK}" stroke-width="2"/><path d="M33 58 q-2 3 0 5" stroke="#9AD1E8" stroke-width="2" stroke-linecap="round"/>`}}},
- pops:{name:'Pops Pointer',color:'#4E9A93',draw(){const c=this.color,B='M40 88 Q35 58 41 32 Q46 18 55 23 Q63 30 60 58 Q58 74 60 88Z';
-  return {back:leg('lb',46,86,11,c,'#3F6E9A')+arm('ab',42,58,-1,c,15),front:leg('lf',55,86,11,c,'#3F6E9A')+arm('af',59,56,1,c,15),
-  bod:tone(B,c)+`<path d="M43 24 q-6 -3 -7 -8 M46 21 q-3 -5 0 -9 M50 20 q1 -5 5 -7 M55 21 q5 -3 8 -1 M58 25 q6 0 7 4 M41 28 q-6 1 -8 -2" stroke="${INK}" stroke-width="3.8" stroke-linecap="round"/><path d="M43 24 q-6 -3 -7 -8 M46 21 q-3 -5 0 -9 M50 20 q1 -5 5 -7 M55 21 q5 -3 8 -1 M58 25 q6 0 7 4 M41 28 q-6 1 -8 -2" stroke="#F3EBDD" stroke-width="1.8" stroke-linecap="round"/>
-  <path d="M40 28 q5 -4 9 0 M53 27 q5 -4 10 1" stroke="${INK}" stroke-width="4.2" stroke-linecap="round" fill="none"/><path d="M40 28 q5 -4 9 0 M53 27 q5 -4 10 1" stroke="#F3EBDD" stroke-width="2.2" stroke-linecap="round" fill="none"/>
-  <circle cx="45.5" cy="34" r="5.4" fill="${CREAM}" stroke="${INK}" stroke-width="2"/><circle cx="57" cy="34" r="5.4" fill="${CREAM}" stroke="${INK}" stroke-width="2"/><path d="M50.9 34 h0.8" stroke="${INK}" stroke-width="2"/><circle cx="47" cy="35" r="1.9" fill="${INK}"/><circle cx="55.5" cy="35" r="1.9" fill="${INK}"/>
-  <circle cx="51.5" cy="41" r="2.6" fill="${c}" stroke="${INK}" stroke-width="1.6"/>
-  <ellipse cx="51.5" cy="51" rx="4.2" ry="4.6" fill="${INK}"/><ellipse cx="52" cy="53.5" rx="2.6" ry="1.6" fill="#E66F79"/>
-  <path d="M37 44 q4 -5 13 -2 q9 -3 13 2 q-1 6 -7 5 q-3 4 -6 0 q-3 4 -6 0 q-6 1 -7 -5z" fill="#F3EBDD" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/><path d="M42 45 l3 2 M57 45 l-3 2" stroke="${INK}" stroke-width=".9"/>
-  <path d="M64 30 q3 2 2 5 M66 26 q3 1 3 3" stroke="#9AD1E8" stroke-width="2" stroke-linecap="round"/>`}}},
- birdie:{name:'Birdie',color:'#D9A93A',draw(){const c=this.color,B='M43 90 Q41 54 44 20 Q50 9 56 20 Q59 54 57 90Z';
-  return {back:leg('lb',47,88,9,c,'#B23F2C')+arm('ab',45,48,-1,c,15),front:leg('lf',54,88,9,c,'#B23F2C')+arm('af',56,48,1,c,15),
-  bod:tone(B,c)+`<path d="M47 13 q-3 -6 -8 -7 M50 11 q0 -7 3 -9 M53 13 q4 -5 9 -5" stroke="${INK}" stroke-width="1.8" stroke-linecap="round" fill="none"/>
-  <ellipse cx="47" cy="27" rx="3.8" ry="3.4" fill="${CREAM}" stroke="${INK}" stroke-width="1.6"/><ellipse cx="55" cy="27" rx="3.8" ry="3.4" fill="${CREAM}" stroke="${INK}" stroke-width="1.6"/><circle cx="47.6" cy="28.3" r="1.6" fill="${INK}"/><circle cx="55.6" cy="28.3" r="1.6" fill="${INK}"/>
-  <path d="M43 26.6 Q47 23 51 26.6Z M51 26.6 Q55 23 59 26.6Z" fill="${c}" stroke="${INK}" stroke-width="1.6"/><path d="M43 26.6 h7.6 M51.4 26.6 h7.6" stroke="${INK}" stroke-width="2.2" stroke-linecap="round"/>
-  <path d="M45 35 Q51 38.5 57 33" fill="none" stroke="${INK}" stroke-width="2" stroke-linecap="round"/><path d="M56 34.2 L68 32" stroke="${INK}" stroke-width="3" stroke-linecap="round"/><path d="M56 34.2 L68 32" stroke="#E9CF9A" stroke-width="1.4" stroke-linecap="round"/>`}}},
- sir:{name:'Sir Ringsley',color:'#A48BC4',draw(){const c=this.color,B='M42 90 Q38 58 44 34 Q50 22 57 32 Q62 54 58 90Z';
-  return {back:leg('lb',47,88,9,c,'#6E4C9A')+arm('ab',44,50,-1,c,14),front:leg('lf',54,88,9,c,'#6E4C9A')+arm('af',57,49,1,c,14),
-  bod:tone(B,c)+`<path d="M46 36 L25 13 L50 31Z" fill="${c}" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/>
-  <circle cx="54.5" cy="33" r="6" fill="${CREAM}" stroke="${INK}" stroke-width="2"/><circle cx="55.5" cy="32" r="2.2" fill="${INK}"/><path d="M50 30 l1.5 1 M51 35 l1.5 -.5" stroke="#D96B6B" stroke-width=".7"/>
-  <circle cx="54.5" cy="33" r="7.6" fill="none" stroke="${INK}" stroke-width="4.2"/><circle cx="54.5" cy="33" r="7.6" fill="none" stroke="#D9A93A" stroke-width="2.2"/><path d="M61 37 q5 9 -1 19" fill="none" stroke="#D9A93A" stroke-width="1.6" stroke-dasharray="1.6 1.4"/>
-  <path d="M55 24 q3 -3 6 -2" stroke="${INK}" stroke-width="2" stroke-linecap="round" fill="none"/>
-  <path d="M46 42 q4 9 10 2 q-5 -4 -10 -2z" fill="${INK}"/><path d="M48 45 q3 2 5 0" stroke="#E66F79" stroke-width="1.6"/>
-  <path d="M41 66 Q50 69 59.5 66 L59.8 71 Q50 74 41 71Z" fill="#7A4A2A" stroke="${INK}" stroke-width="1.8"/><circle cx="50" cy="69" r="4.6" fill="none" stroke="${INK}" stroke-width="4.4"/><circle cx="50" cy="69" r="4.6" fill="none" stroke="#D9A93A" stroke-width="2.4"/>`}}},
- lil:{name:'Lil Pink',color:'#EE9A7C',draw(){const c=this.color,B='M36 76 Q36 60 50 60 Q64 60 64 76 Q64 92 50 92 Q36 92 36 76Z';
-  return {back:leg('lb',45,90,7,c,'#B23F2C')+arm('ab',37,76,-1,c,11),front:leg('lf',55,90,7,c,'#B23F2C')+arm('af',63,76,1,c,11),
-  bod:tone(B,c)+`<path d="M35 69 Q35 54 50 54 Q65 54 65 69 Q57 65 50 65 Q43 65 35 69Z" fill="#3F6E9A" stroke="${INK}" stroke-width="2.2"/><path d="M37 66 l-13 3 q-3 -4 2 -7 l11 -2" fill="#3F6E9A" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/><path d="M60 58 h-6 v4" stroke="${INK}" stroke-width="1.4" fill="none"/>
-  <path d="M41 70 L48 73 M59 70 L52 73" stroke="${INK}" stroke-width="2.6" stroke-linecap="round"/>
-  <ellipse cx="45" cy="75" rx="3.6" ry="3" fill="${CREAM}" stroke="${INK}" stroke-width="1.6"/><ellipse cx="55" cy="75" rx="3.6" ry="3" fill="${CREAM}" stroke="${INK}" stroke-width="1.6"/><circle cx="46" cy="75.5" r="1.5" fill="${INK}"/><circle cx="54" cy="75.5" r="1.5" fill="${INK}"/>
-  <path d="M41 80 Q50 93 60 80Z" fill="${INK}"/><ellipse cx="51" cy="86" rx="4.5" ry="2.6" fill="#E66F79"/><path d="M43 80.5 h3 M55 80.5 h3" stroke="${CREAM}" stroke-width="2"/>
-  <path d="M66 62 q3 2 2 5" stroke="#9AD1E8" stroke-width="2" stroke-linecap="round"/>`}}}
-};
+// ---------- the gang (karts live in gang.js) ----------
+const GANG=window.GANG;
+const sprite=(id,state='idle')=>window.racer(id,state);
 const ART={thumbs:'thumbo',pops:'indo',birdie:'middo',sir:'ringo',lil:'pinko'};
 const art=(id,cls='')=>`<div class="art ${cls}"><img src="img/${ART[id]}.jpg" alt="${GANG[id].name}"></div>`;
-function sprite(id,state='idle',flip=false){const p=GANG[id].draw();
-  return `<svg class="spr ${state}" viewBox="0 0 100 112" role="img" aria-label="${GANG[id].name}"${flip?' style="transform:scaleX(-1)"':''}><g>${p.back}<g class="bod">${p.bod}</g>${p.front}</g></svg>`}
 
 // ---------- passages ----------
 const PASS=["the cat waited by the door all afternoon when the mail finally arrived she sniffed it once looked deeply disappointed and went back to sleep","my grandmother keeps a jar of buttons that nobody is allowed to use she says each one is a memory and some are older than our house","he practiced the speech in the shower for a week on the big day he forgot every word told a joke instead and got a standing ovation","the last slice of pizza sat alone in the box four roommates walked past it twice each too polite to take it and too hungry to forget it","she planted sunflowers along the fence in spring by august they were taller than the neighbors who started waving at the flowers instead","the pilot announced a short delay somewhere in row twelve a baby laughed and suddenly the whole cabin decided to be in a good mood","we got lost on the way to the beach and found a tiny bakery instead it is still the best wrong turn any of us has ever made","the robot vacuum bumped into the couch for the fifth time paused and turned around as if it had suddenly remembered an appointment","every sunday my dad makes pancakes shaped like animals most of them look like potatoes but we always guess the animal out loud anyway","halfway up the mountain i wanted to quit at the top eating a squished sandwich above the clouds i could not remember why","octopuses have three hearts and blue blood two hearts pump blood to the gills while the third keeps it moving through the rest of the body","a day on venus is longer than a year on venus the planet spins so slowly that it circles the sun before it finishes one rotation","sea otters often hold hands while they sleep so they do not drift apart a group of resting otters floating together is called a raft","wombats produce cube shaped poop scientists think the shape helps it stay put so the droppings can mark territory without rolling away","there are more ways to shuffle a deck of cards than there are atoms on earth any well shuffled deck is almost certainly in a brand new order","a group of flamingos is called a flamboyance they get their pink color from the tiny shrimp and algae they eat every day","drink some water step outside and look at something far away half of your problems feel smaller after ten minutes of sky","be the kind of person who returns the shopping cart nobody is watching and that is exactly the point","say thank you more than you think you need to people remember how you made them feel long after they forget what you said","small habits add up quietly one page a day is a dozen books a year and nobody notices until you are suddenly the one who reads","a penguin in a tuxedo walked into a fancy restaurant the waiter apologized and said the dress code was casual tonight","my phone changed dinner to diner so now my whole family thinks i bought a restaurant i am not correcting them yet","the toaster and the microwave are not speaking nobody knows what happened but the bread has clearly picked a side","if a llama wore pajamas would it be a pajama llama or a llama in pajamas experts are divided and frankly a little tired","i told my plant a joke today it did not laugh but it did grow one new leaf which i am choosing to see as a polite chuckle","the squirrel outside my window has a better routine than i do wake up snack sprint nap snack again and no emails at all","my cat knocked a glass off the table stared at me and then knocked off a second one just to make sure i understood the message","the weather app said zero percent chance of rain and the clouds took that personally i am now writing this from inside a puddle","today i pressed the elevator button eleven times it did not come faster but it did make me feel like a very important person","my smart fridge sent me a notification that just said we need to talk i have not opened the kitchen door since"];
@@ -352,12 +331,12 @@ function startRace(mode){
   renderText();live();layoutTrack();inp.focus({preventScroll:true});
   const c=$('#count');c.classList.remove('hidden');let n=3;c.textContent=n;beep(440,.15,.04,'square');
   clearInterval(R.cd);R.cd=setInterval(()=>{n--;if(n>0){c.textContent=n;beep(440,.15,.04,'square')}else{clearInterval(R.cd);c.textContent='Go!';beep(880,.3,.04,'square');R.state='run';R.t0=performance.now();inp.value='';
-    R.rows.forEach(r=>r.el.querySelector('.spr').classList.replace('idle','run'));setTimeout(()=>c.classList.add('hidden'),450);requestAnimationFrame(loop)}},700);
+    R.rows.forEach(r=>r.el.querySelector('.racer').classList.replace('idle','run'));setTimeout(()=>c.classList.add('hidden'),450);requestAnimationFrame(loop)}},700);
 }
 function pickPractice(){let pool=PASS.map((t,i)=>i).filter(i=>!S.recent.includes(i));if(!pool.length)pool=PASS.map((t,i)=>i);const i=pick(pool);S.recent=[i,...S.recent].slice(0,12);save();return PASS[i]}
-let trackW=300;function layoutTrack(){const w=$('#track').clientWidth;if(w>0)trackW=w-34-20;place()}
+let trackW=300;function layoutTrack(){const w=$('#track').clientWidth;if(w>0)trackW=w-60-20;place()}
 function place(){if(!R)return;const T=R.text.length;R.rows.forEach((r,k)=>{const f=r.me?(R.committed+R.good)/T:R.bots[k-1].pos/T;r.el.style.transform=`translateX(${Math.min(1,f)*trackW}px)`;
-  if((r.me?R.state==='done':R.bots[k-1].fin!=null)&&r.el.querySelector('.run'))r.el.querySelector('.spr').classList.replace('run','idle')})}
+  if((r.me?R.state==='done':R.bots[k-1].fin!=null)&&r.el.querySelector('.run'))r.el.querySelector('.racer').classList.replace('run','idle')})}
 inp.addEventListener('input',e=>{
   if(!R||R.state!=='run'){inp.value='';return}
   let v=inp.value.toLowerCase();const before=R.errNow;
@@ -417,9 +396,9 @@ function renderHome(){
   const td=todayDaily();$('#dLabel').textContent=`Track no. ${dayNum()}`;
   $('#dailyCta').innerHTML=td?`<div class="box dres">${sprite('thumbs',td.place===1?'cheer':'idle')}<div><span class="lbl">Today's result</span><div class="big">${td.place}${sfx(td.place)} · ${td.wpm} wpm</div><span class="lbl">New track tomorrow</span></div></div>`
     :`<button class="btn go" id="bDaily"><span class="stack">Race today's track<small>60 seconds · same track for everyone</small></span></button>`;
-  const dc=$('#dailyCta .spr');if(dc)dc.style.cssText='width:64px;height:72px;flex:none';
+  const dc=$('#dailyCta .racer');if(dc)dc.style.cssText='width:78px;height:73px;flex:none';
   const b=$('#bDaily');if(b)b.onclick=()=>startRace('daily');
-  $('#gangRow').innerHTML=Object.keys(GANG).map(id=>`<div class="who">${sprite(id,'idle static')}<span>${GANG[id].name}</span></div>`).join('');
+  $('#gangRow').innerHTML=Object.keys(GANG).map(id=>`<div class="who">${sprite(id,'idle')}<span>${GANG[id].name}</span></div>`).join('');
   document.querySelectorAll('.looks button').forEach(x=>x.classList.toggle('on',x.dataset.look===S.look));
 }
 document.querySelectorAll('.looks button').forEach(x=>x.onclick=()=>{S.look=x.dataset.look;save();renderHome()});
