@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#EEDBB8">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Thumb Rally">
+<meta name="apple-mobile-web-app-title" content="Typo Derby">
 <link rel="apple-touch-icon" href="img/icon-180.png">
 <link rel="icon" href="img/icon-192.png">
-<meta property="og:title" content="Thumb Rally">
+<meta property="og:title" content="Typo Derby">
 <meta property="og:description" content="The daily typing derby. One track a day, same for everyone.">
 <meta property="og:image" content="https://terekim.github.io/thumbrally/img/gang.jpg">
-<title>Thumb Rally</title>
+<title>Typo Derby</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Shantell+Sans:wght@400;600;800&display=swap">
@@ -208,7 +208,7 @@ svg.defs{position:absolute;width:0;height:0}
 
 <section id="home">
   <header class="hbar">
-    <div class="hlogo">Thumb Rally</div>
+    <div class="hlogo">Typo Derby</div>
     <div class="chip" title="Day streak"><svg viewBox="0 0 24 24"><path d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-6 0 2 1 3 2 3 0-4-1-6 1-9Z" fill="#B23F2C" stroke="#211C18" stroke-width="2"/></svg><span id="hStreak">0</span></div>
     <div class="chip" title="Personal best"><span id="hBest">0</span>&nbsp;wpm</div>
   </header>
@@ -249,7 +249,7 @@ svg.defs{position:absolute;width:0;height:0}
   <div class="btnrow"><button class="btn go" id="bAgain" style="font-size:20px">Race again</button><button class="btn" id="bHome">Home</button></div>
 </div>
 <div id="rp" class="hidden"><canvas id="rpCv" width="1080" height="1920"></canvas><span id="rpMsg">Filming the replay…</span></div>
-<div id="shot" class="hidden"><img id="shotImg" alt="Your result card"><video id="shotVid" class="hidden" playsinline loop muted autoplay></video><p id="shotMsg">Press and hold the card to save it, then post it to your story.</p><a id="shotDl" class="btn alt hidden" style="max-width:220px" download="thumb-rally-replay">Save video</a><button class="btn" id="shotClose" style="max-width:220px">Close</button></div>
+<div id="shot" class="hidden"><img id="shotImg" alt="Your result card"><video id="shotVid" class="hidden" playsinline loop muted autoplay></video><p id="shotMsg">Press and hold the card to save it, then post it to your story.</p><a id="shotDl" class="btn alt hidden" style="max-width:220px" download="typo-derby-replay">Save video</a><button class="btn" id="shotClose" style="max-width:220px">Close</button></div>
 
 <script>
 (()=>{
@@ -371,7 +371,7 @@ function finish(){R.state='done';R.t=(performance.now()-R.t0)/1000;lastF=0;const
   const field=[{id:R.me,name:'You',fin:R.t,wpm,me:1},...R.bots.map(b=>({id:b.id,name:GANG[b.id].name,fin:b.fin,wpm:Math.round(b.wpm)}))].sort((x,y)=>x.fin-y.fin);
   $('#rBoard').innerHTML='<span class="lbl">Results</span>'+field.map((f,i)=>`<div class="brow${f.me?' me':''}"><span class="n">${i+1}</span><img src="${kartSrc(f.id)}" alt=""><span>${f.name}</span><span class="w">${f.wpm} wpm</span></div>`).join('');
   R.card={text:R.text,mode:R.mode,no:dayNum(),place:pl,wpm,acc:a,driver:R.me,ids:[R.me,...R.bots.map(b=>b.id)],trail:R.trail,fins:R.bots.map(b=>b.fin),tEnd:R.t};
-  $('#rCard').innerHTML=`<span class="logo">Thumb Rally</span><small>${R.mode==='daily'?'Track no. '+dayNum():'Practice race'}</small><img src="${faceSrc(R.me)}" alt=""><div class="big">${pl}${sfx(pl)}!<br>${wpm} wpm</div><small>${a}% accuracy<br>terekim.github.io/thumbrally</small>`;
+  $('#rCard').innerHTML=`<span class="logo">Typo Derby</span><small>${R.mode==='daily'?'Track no. '+dayNum():'Practice race'}</small><img src="${faceSrc(R.me)}" alt=""><div class="big">${pl}${sfx(pl)}!<br>${wpm} wpm</div><small>${a}% accuracy<br>terekim.github.io/thumbrally</small>`;
   setTimeout(()=>{inp.blur();$('#res').scrollTop=0;$('#res').classList.add('show')},800)}
 
 const loadImg=src=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=src});
@@ -383,7 +383,7 @@ async function cardBlob(c){
   x.strokeStyle='#211C18';x.lineWidth=18;x.strokeRect(9,9,W-18,H-18);
   const outlined=(t,px,py,size,fill,rot=0)=>{x.save();x.translate(px,py);x.rotate(rot);x.font=`${size}px "Bowlby One", Impact, sans-serif`;x.textAlign='center';x.lineJoin='round';
     x.fillStyle='#211C18';x.fillText(t,size*.06,size*.06);x.strokeStyle='#211C18';x.lineWidth=size*.09;x.strokeText(t,0,0);x.fillStyle=fill;x.fillText(t,0,0);x.restore()};
-  outlined('THUMB RALLY',W/2,210,118,'#FBF1DD',-.05);
+  outlined('TYPO DERBY',W/2,210,118,'#FBF1DD',-.05);
   x.font='800 40px "Shantell Sans", sans-serif';x.fillStyle='#FBF1DD';x.textAlign='center';x.fillText((c.mode==='daily'?'TRACK NO. '+c.no:'PRACTICE RACE'),W/2,300);
   try{const k=await loadImg(faceSrc(c.driver));const kw=Math.min(980,600*k.width/k.height),kh=kw*k.height/k.width;x.save();x.translate(W/2,730);x.rotate(-.04);x.drawImage(k,-kw/2,-kh/2,kw,kh);x.restore()}catch(e){}
   outlined(`${c.place}${sfx(c.place).toUpperCase()}!`,W/2,1290,250,'#FBF1DD',-.04);
@@ -393,8 +393,8 @@ async function cardBlob(c){
   return new Promise(ok=>cv.toBlob(ok,'image/png'));
 }
 $('#bShare').onclick=async()=>{if(!R||!R.card)return;const btn=$('#bShare');btn.textContent='Making card…';
-  try{const blob=await cardBlob(R.card);const file=new File([blob],'thumb-rally.png',{type:'image/png'});
-    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'Thumb Rally',text:`${R.card.place}${sfx(R.card.place)} at ${R.card.wpm} wpm on Thumb Rally`})}
+  try{const blob=await cardBlob(R.card);const file=new File([blob],'typo-derby.png',{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'Typo Derby',text:`${R.card.place}${sfx(R.card.place)} at ${R.card.wpm} wpm on Typo Derby`})}
     else{$('#shotImg').src=URL.createObjectURL(blob);$('#shot').classList.remove('hidden')}
   }catch(e){if(e&&e.name!=='AbortError')$('#shareHint').textContent='Sharing is blocked here. Screenshot the card instead.'}
   btn.textContent='Share card'};
@@ -429,7 +429,7 @@ async function makeReplay(c){
   const names=c.ids.map((id,i)=>i===0?'YOU':GANG[id].name.toUpperCase());
   function frame(t){
     x.drawImage(dots,0,0);
-    out('THUMB RALLY',W/2,170,112,'#FBF1DD',-.04);
+    out('TYPO DERBY',W/2,170,112,'#FBF1DD',-.04);
     x.font='800 40px "Shantell Sans", sans-serif';x.fillStyle='#FBF1DD';x.textAlign='center';x.fillText((c.mode==='daily'?'TRACK NO. '+c.no:'PRACTICE RACE')+' · FULL RACE'+(SPEED>1.05?' · '+SPEED.toFixed(1)+'X SPEED':''),W/2,262);
     // track
     x.fillStyle='#E4CB9E';x.fillRect(20,top-20,W-40,laneH*5+40);
@@ -467,11 +467,11 @@ async function makeReplay(c){
 }
 $('#bReplay').onclick=async()=>{if(!R||!R.card||!R.card.trail||R.card.trail.length<5)return;const btn=$('#bReplay');btn.textContent='Filming…';$('#rp').classList.remove('hidden');
   try{const blob=await makeReplay(R.card);$('#rp').classList.add('hidden');
-    const ext=blob.type.includes('mp4')?'mp4':'webm',file=new File([blob],'thumb-rally-replay.'+ext,{type:blob.type});
+    const ext=blob.type.includes('mp4')?'mp4':'webm',file=new File([blob],'typo-derby-replay.'+ext,{type:blob.type});
     let shared=false;
-    if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:'Thumb Rally'});shared=true}catch(e){if(e.name==='AbortError')shared=true}}
+    if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:'Typo Derby'});shared=true}catch(e){if(e.name==='AbortError')shared=true}}
     if(!shared){const url=URL.createObjectURL(blob),v=$('#shotVid');v.src=url;v.classList.remove('hidden');$('#shotImg').classList.add('hidden');
-      const dl=$('#shotDl');dl.href=url;dl.download='thumb-rally-replay.'+ext;dl.classList.remove('hidden');$('#shotMsg').textContent='Save the video, then post it to your story.';$('#shot').classList.remove('hidden')}
+      const dl=$('#shotDl');dl.href=url;dl.download='typo-derby-replay.'+ext;dl.classList.remove('hidden');$('#shotMsg').textContent='Save the video, then post it to your story.';$('#shot').classList.remove('hidden')}
   }catch(e){$('#rp').classList.add('hidden');$('#shareHint').textContent='Video replays are not supported in this browser. Try Safari or Chrome.'}
   btn.textContent='Share race replay'};
 
