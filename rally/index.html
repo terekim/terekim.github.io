@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=resizes-content">
+<meta name="theme-color" content="#08070c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Thumb Rally">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<title>Thumb Rally</title>
+<style>
+:root{--bg:#08070c;--fg:#f3f1ff;--dim:#8d89a6;--card:rgba(255,255,255,.055);--line:rgba(255,255,255,.1);--accent:#ff3d81;--good:#3ef0a1;--bad:#ff4d5e;--me:#2de2ff}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Rounded","Segoe UI",Roboto,sans-serif;overflow:hidden;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-user-select:none;user-select:none}
+#app{position:fixed;top:0;left:0;right:0;height:100%;display:flex;flex-direction:column;overflow:hidden}
+.hidden{display:none!important}
+.btn{display:block;width:100%;padding:15px;border-radius:16px;background:var(--card);border:1px solid var(--line);font-size:17px;font-weight:700;text-align:center}
+.btn.go{background:linear-gradient(135deg,#ff3d81,#ff8a3d);border:0;color:#fff;font-size:20px;padding:18px;box-shadow:0 8px 30px rgba(255,61,129,.35)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px}
+.card h3{font-size:12px;text-transform:uppercase;letter-spacing:1.2px;color:var(--dim);margin-bottom:10px;font-weight:700}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{flex:1;min-width:70px;padding:9px 6px;border-radius:12px;border:1px solid var(--line);font-size:13px;font-weight:650;color:var(--dim)}
+.chip.on{color:var(--fg);border-color:var(--accent);background:rgba(255,61,129,.14)}
+/* home */
+#home{flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 18px) 16px calc(env(safe-area-inset-bottom) + 18px);display:flex;flex-direction:column;gap:14px}
+.brand{text-align:center;padding-top:2vh}
+.logo{font-size:44px;font-weight:900;font-style:italic;letter-spacing:-1.5px;line-height:1;background:linear-gradient(90deg,#2de2ff,#ff3d81 55%,#ffb03d);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 18px rgba(255,61,129,.35))}
+.tag{color:var(--dim);margin-top:6px;font-size:14px}
+.hero-car{height:44px;margin:14px auto 0;width:120px;position:relative}
+.hero-car svg{width:120px;height:44px;filter:drop-shadow(0 0 12px currentColor)}
+.speedlines{position:absolute;left:-40px;top:14px;width:40px;height:16px;background:repeating-linear-gradient(180deg,transparent 0 3px,rgba(255,255,255,.25) 3px 4px);mask:linear-gradient(90deg,transparent,#000);-webkit-mask:linear-gradient(90deg,transparent,#000)}
+.rank{display:flex;align-items:center;justify-content:space-between}
+.rank .big{font-size:22px;font-weight:850}
+.rank .sub{color:var(--dim);font-size:12px;margin-top:2px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px;text-align:center}
+.kpis b{display:block;font-size:19px;font-weight:800}
+.kpis span{font-size:11px;color:var(--dim)}
+#spark{width:100%;height:70px;margin-top:12px;display:block}
+.garage{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.paint{border-radius:12px;border:1px solid var(--line);padding:8px 0 6px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--dim)}
+.paint svg{width:44px;height:20px}
+.paint.on{border-color:var(--fg);background:rgba(255,255,255,.07);color:var(--fg)}
+.paint.locked{opacity:.35}
+.foot{text-align:center;color:var(--dim);font-size:12px;line-height:1.6}
+.foot .ok{color:var(--good)}
+/* race */
+#race{flex:1;display:flex;flex-direction:column;gap:8px;padding:calc(env(safe-area-inset-top) + 8px) 12px 8px;min-height:0}
+.rtop{display:flex;align-items:center;gap:10px}
+.x{width:36px;height:36px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-size:16px;flex:none}
+.live{flex:1;display:flex;justify-content:space-around;text-align:center}
+.live b{display:block;font-size:20px;font-weight:850;font-variant-numeric:tabular-nums;line-height:1.1}
+.live span{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+#track{position:relative;border-radius:14px;background:linear-gradient(180deg,#111018,#0c0b12);border:1px solid var(--line);padding:4px 0;flex:none;overflow:hidden}
+.lane{position:relative;height:28px;border-bottom:1px dashed rgba(255,255,255,.07)}
+.lane:last-child{border-bottom:0}
+.lane .nm{position:absolute;right:22px;top:50%;transform:translateY(-50%);font-size:9px;color:rgba(255,255,255,.28);font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap}
+.car{position:absolute;top:4px;left:0;width:44px;height:20px;will-change:transform}
+.car svg{width:44px;height:20px;display:block}
+.car.me svg{filter:drop-shadow(0 0 6px currentColor)}
+.car.ghost{opacity:.35}
+.finish{position:absolute;top:0;bottom:0;right:6px;width:8px;background:conic-gradient(#fff 25%,#000 0 50%,#fff 0 75%,#000 0) 0 0/8px 8px;opacity:.6}
+#count{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:54px;font-weight:900;font-style:italic;background:rgba(8,7,12,.55);pointer-events:none}
+#text{flex:1;min-height:56px;overflow-y:auto;font-size:19px;line-height:1.55;padding:10px 12px;border-radius:14px;background:var(--card);border:1px solid var(--line);color:#6f6b86;scroll-behavior:smooth;-webkit-user-select:none;user-select:none}
+#text .done{color:var(--fg)}
+#text .ok{color:var(--good)}
+#text .err{color:#fff;background:var(--bad);border-radius:3px}
+#text .cur{border-bottom:2px solid var(--me);color:#cfcbe6}
+#text .caret{display:inline-block;width:2px;height:1.1em;background:var(--me);vertical-align:-2px;margin-right:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+#inp{flex:none;width:100%;font-size:18px;padding:12px 14px;border-radius:14px;border:2px solid var(--line);background:#111018;color:var(--fg);outline:none;font-family:inherit}
+#inp.bad{border-color:var(--bad);background:#2a0f16}
+#inp:focus{border-color:var(--me)}
+#inp.bad:focus{border-color:var(--bad)}
+#tapkb{flex:none;text-align:center;font-size:12px;color:var(--dim)}
+/* results */
+#res{position:fixed;inset:0;background:rgba(6,5,10,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s;z-index:5}
+#res.show{opacity:1;pointer-events:auto}
+.rc{width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px;text-align:center}
+.place{font-size:40px;font-weight:900;font-style:italic}
+.wpmbig{font-size:64px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums;background:linear-gradient(90deg,#2de2ff,#ff3d81);-webkit-background-clip:text;background-clip:text;color:transparent}
+.wpmbig small{font-size:18px;-webkit-text-fill-color:var(--dim)}
+.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.rgrid div{background:var(--card);border-radius:12px;padding:10px 0}
+.rgrid b{display:block;font-size:18px}
+.rgrid span{font-size:11px;color:var(--dim)}
+.badge{display:inline-block;margin:0 auto;padding:6px 12px;border-radius:999px;background:rgba(62,240,161,.15);color:var(--good);font-weight:750;font-size:13px}
+.badge.pink{background:rgba(255,61,129,.15);color:#ff7aa8}
+.podium{font-size:13px;color:var(--dim);line-height:1.7}
+.podium b{color:var(--fg)}
+</style>
+</head>
+<body>
+<div id="app">
+
+<section id="home">
+  <div class="brand">
+    <div class="logo">THUMB RALLY</div>
+    <div class="tag">Race bots and your own ghost. Thumbs only.</div>
+    <div class="hero-car" id="heroCar"><div class="speedlines"></div></div>
+  </div>
+  <button class="btn go" id="bRace">Race! 🏁</button>
+  <div class="card">
+    <div class="rank"><div><div class="big" id="rName">Rookie</div><div class="sub" id="rNext">Finish a race to get ranked</div></div><div style="font-size:30px" id="rIcon">🔰</div></div>
+    <div class="kpis"><div><b id="kBest">0</b><span>best wpm</span></div><div><b id="kAvg">0</b><span>avg (10)</span></div><div><b id="kRaces">0</b><span>races</span></div><div><b id="kWins">0</b><span>wins</span></div></div>
+    <svg id="spark" viewBox="0 0 300 70" preserveAspectRatio="none"></svg>
+  </div>
+  <div class="card">
+    <h3>Garage · win races to unlock paint</h3>
+    <div class="garage" id="garage"></div>
+  </div>
+  <div class="card">
+    <h3>Text pack</h3>
+    <div class="chips" id="cPack"><button class="chip" data-v="mix">Mixed</button><button class="chip" data-v="story">Tiny stories</button><button class="chip" data-v="fact">Weird facts</button><button class="chip" data-v="wise">Wisdom</button><button class="chip" data-v="silly">Silly</button></div>
+  </div>
+  <div class="card">
+    <h3>Mode</h3>
+    <div class="chips" id="cEasy" style="margin-bottom:8px"><button class="chip" data-v="1">Easy: no caps or punctuation</button><button class="chip" data-v="0">Pro: exact text</button></div>
+    <div class="chips" id="cSound"><button class="chip" data-v="1">Sound on</button><button class="chip" data-v="0">Sound off</button></div>
+  </div>
+  <div class="foot"><span id="offline">Preparing offline mode…</span><br><span id="a2hs"></span></div>
+</section>
+
+<section id="race" class="hidden">
+  <div class="rtop">
+    <button class="x" id="bQuit" aria-label="Quit">✕</button>
+    <div class="live"><div><b id="lWpm">0</b><span>wpm</span></div><div><b id="lPlace">–</b><span>place</span></div><div><b id="lAcc">100%</b><span>accuracy</span></div><div><b id="lTime">0.0</b><span>sec</span></div></div>
+  </div>
+  <div id="track"><div class="finish"></div><div id="lanes"></div><div id="count">3</div></div>
+  <div id="text"></div>
+  <input id="inp" type="text" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" inputmode="text" enterkeyhint="go" aria-label="Type here">
+  <div id="tapkb" class="hidden">Tap the box above if your keyboard closed</div>
+</section>
+
+</div>
+
+<div id="res">
+  <div class="rc">
+    <div class="place" id="oPlace">1st 🏆</div>
+    <div class="wpmbig"><span id="oWpm">0</span> <small>wpm</small></div>
+    <div id="oBadges" style="display:flex;flex-direction:column;gap:6px"></div>
+    <div class="rgrid"><div><b id="oAcc">100%</b><span>accuracy</span></div><div><b id="oTime">0s</b><span>time</span></div><div><b id="oErr">0</b><span>typos</span></div></div>
+    <div class="podium" id="oPodium"></div>
+    <button class="btn go" id="oAgain">Race again</button>
+    <button class="btn" id="oHome">Home</button>
+  </div>
+</div>
+
+<script>
+(()=>{
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem('rally.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('rally.'+k,JSON.stringify(v))}catch(e){}}};
+const S=Object.assign({races:0,wins:0,best:0,hist:[],ghost:null,color:0,easy:true,sound:true,pack:'mix',recent:[]},store.get('save',{}));
+const persist=()=>store.set('save',S);
+
+// ---------- content ----------
+const PACKS={
+story:["The cat waited by the door all afternoon. When the mail finally arrived, she sniffed it once, looked deeply disappointed, and went back to sleep.",
+"My grandmother keeps a jar of buttons that nobody is allowed to use. She says each one is a memory, and some of them are older than our house.",
+"He practiced the speech in the shower for a week. On the big day he forgot every word, told a joke instead, and got a standing ovation.",
+"The last slice of pizza sat alone in the box. Four roommates walked past it twice, each one too polite to take it and too hungry to forget it.",
+"She planted sunflowers along the fence in spring. By August they were taller than the neighbors, who started waving at the flowers instead of her.",
+"The pilot announced a short delay. Somewhere in row twelve a baby laughed, and suddenly the whole cabin decided to be in a good mood.",
+"We got lost on the way to the beach and found a tiny bakery instead. It is still the best wrong turn any of us has ever made.",
+"The robot vacuum bumped into the couch for the fifth time, paused, and then turned around as if it had suddenly remembered an appointment.",
+"Every Sunday my dad makes pancakes shaped like animals. Most of them look like potatoes, but we always guess the animal out loud anyway.",
+"The new kid sat alone at lunch until someone slid over a cookie without a word. Twenty years later, they were still best friends.",
+"Halfway up the mountain I wanted to quit. At the top, eating a squished sandwich above the clouds, I could not remember why.",
+"The old dog no longer chases the ball. He just watches it roll away, wags his tail, and lets the puppy do the running for both of them."],
+fact:["Octopuses have three hearts and blue blood. Two of the hearts pump blood to the gills, while the third keeps it moving through the rest of the body.",
+"Honey almost never spoils. Archaeologists have found pots of honey in ancient Egyptian tombs that were thousands of years old and still edible.",
+"A day on Venus is longer than a year on Venus. The planet spins so slowly that it circles the sun before it finishes a single rotation.",
+"Bananas are berries, but strawberries are not. In botany, a berry grows from a single flower with one ovary, and strawberries break that rule.",
+"Sea otters often hold hands while they sleep so they do not drift apart. A group of resting otters floating together is called a raft.",
+"The Eiffel Tower grows taller in summer. Heat makes the iron expand, adding up to about fifteen centimeters to its height on hot days.",
+"Wombats produce cube shaped poop. Scientists think the shape helps it stay put, so the droppings can mark territory without rolling away.",
+"Your brain uses about twenty percent of your body's energy, even though it makes up only around two percent of your weight.",
+"Lightning is about five times hotter than the surface of the sun. A single bolt can heat the air around it to roughly thirty thousand kelvin.",
+"Some turtles can breathe through their rear ends. In winter, certain species absorb oxygen from the water this way while resting on the bottom.",
+"There are more ways to shuffle a deck of cards than there are atoms on Earth. Any well shuffled deck is almost certainly in a brand new order.",
+"A group of flamingos is called a flamboyance. They get their pink color from the tiny shrimp and algae they eat every day."],
+wise:["You do not have to be great to start, but you do have to start to be great. The first draft is allowed to be terrible. That is its job.",
+"Drink some water, step outside, and look at something far away. Half of your problems feel smaller after ten minutes of sky.",
+"Be the kind of person who returns the shopping cart. Nobody is watching, and that is exactly the point.",
+"Comparison is a thief with excellent timing. Run your own race, at your own pace, and check your own progress instead of theirs.",
+"Say thank you more than you think you need to. People remember how you made them feel long after they forget what you said.",
+"Rest is not a reward for finishing. It is part of the work, the same way silence is part of the music.",
+"If it takes less than two minutes, do it now. A tiny task left waiting grows heavier every time you look at it.",
+"Ask the question. The worst answer is no, and no is just the place where a better question usually begins.",
+"Small habits add up quietly. One page a day is a dozen books a year, and nobody notices until you are suddenly the one who reads.",
+"Your future self is watching what you do right now. Give them something to be grateful for, even if it is only a good night of sleep.",
+"Mistakes are proof that you are trying. Keep the lesson, lose the shame, and go again with slightly better aim.",
+"Call your people. The ones who knew you before you figured anything out are rare, and they will not be around forever."],
+silly:["A penguin in a tuxedo walked into a fancy restaurant. The waiter apologized and said the dress code was casual tonight.",
+"My phone changed dinner to diner, so now my whole family thinks I bought a restaurant. I am not correcting them yet.",
+"The toaster and the microwave are not speaking. Nobody knows what happened, but the bread has clearly picked a side.",
+"Breaking news: local man finally finds the end of the tape roll and declares it the greatest day of his entire life.",
+"If a llama wore pajamas, would it be a pajama llama or a llama in pajamas? Experts are divided and frankly a little tired.",
+"I told my plant a joke today. It did not laugh, but it did grow one new leaf, which I am choosing to see as a polite chuckle.",
+"The squirrel outside my window has a better routine than I do. Wake up, snack, sprint, nap, snack again, and no emails at all.",
+"My cat knocked a glass off the table, stared at me, and then knocked off a second one just to make sure I understood the message.",
+"I tried to organize my sock drawer, but every pair had already run away together. Only the single socks remain, plotting revenge.",
+"The weather app said zero percent chance of rain, and the clouds took that personally. I am now writing this from inside a puddle.",
+"Today I pressed the elevator button eleven times. It did not come faster, but it did make me feel like a very important person.",
+"My smart fridge sent me a notification that just said we need to talk. I have not opened the kitchen door since."]};
+const ALL=Object.entries(PACKS).flatMap(([k,a])=>a.map((t,i)=>k+':'+i));
+function pickText(){const pool=ALL.filter(id=>(S.pack==='mix'||id.startsWith(S.pack+':'))&&!S.recent.includes(id));const list=pool.length?pool:ALL.filter(id=>S.pack==='mix'||id.startsWith(S.pack+':'));
+  const id=list[(Math.random()*list.length)|0];S.recent=[id,...S.recent].slice(0,20);const[k,i]=id.split(':');let t=PACKS[k][+i];
+  if(S.easy)t=t.toLowerCase().replace(/[^a-z ]/g,'').replace(/\s+/g,' ').trim();return t}
+
+// ---------- cars ----------
+const PAINTS=[['Cyan','#2de2ff',0],['Hot pink','#ff3d81',1],['Lime','#9dff3d',3],['Tangerine','#ff8a3d',5],['Violet','#a76bff',8],['Ice','#e8f4ff',12],['Gold','#ffd23d',20],['Ruby','#ff2b3d',30]];
+const carSVG=c=>`<svg viewBox="0 0 44 20" style="color:${c}"><path fill="currentColor" d="M2 14.5 3.5 10Q5 7.5 9 7.2L15 6.8 20.5 2.6Q22 1.5 24.5 1.5H30Q32.5 1.5 34 3.2L37.5 7.2Q42 8 42.5 11.5V14.5Z"/><path fill="#0b0a10" opacity=".55" d="M17.5 7 21.6 3.6Q22.6 2.9 24.2 2.9H26.8V7ZM28.2 2.9H30Q31.6 2.9 32.6 4L35 7H28.2Z"/><circle cx="11" cy="15.2" r="3.6" fill="#0b0a10" stroke="currentColor" stroke-width="1.6"/><circle cx="33.5" cy="15.2" r="3.6" fill="#0b0a10" stroke="currentColor" stroke-width="1.6"/></svg>`;
+const BOTNAMES=['Grandma Gigi','Turbo Tom','Auto Correct','Speedy Sue','Captain Caps','Lag Lord','Sir Swipe','Thumb Wars','Emoji Emma','Typo Tyler','Fast Fiona','Slow Joe Pro','Backspace Bob','Keyboard Kim'];
+const BOTCOLORS=['#ffb03d','#9dff3d','#a76bff','#ff6b6b','#ffd23d','#7af0ff'];
+
+// ---------- sound ----------
+let AC=null;
+function tone(f,d=.06,v=.035,type='sine',delay=0){if(!S.sound)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();
+  const t0=AC.currentTime+delay,o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(v,t0+.006);g.gain.exponentialRampToValueAtTime(.0001,t0+d);o.connect(g).connect(AC.destination);o.start(t0);o.stop(t0+d+.02)}catch(e){}}
+const buzz=ms=>{try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}};
+
+// ---------- viewport (keep UI above the keyboard) ----------
+const app=$('#app');
+function fitVV(){const vv=window.visualViewport;if(!vv)return;app.style.height=vv.height+'px';app.style.transform=`translateY(${vv.offsetTop}px)`;if(R)layoutTrack()}
+if(window.visualViewport){visualViewport.addEventListener('resize',fitVV);visualViewport.addEventListener('scroll',fitVV)}
+addEventListener('resize',fitVV);
+
+// ---------- race ----------
+let R=null;const inp=$('#inp');
+const avgRecent=n=>{const h=S.hist.slice(-n);return h.length?h.reduce((a,b)=>a+b,0)/h.length:0};
+function newRace(){
+  const text=pickText();const base=Math.max(14,avgRecent(5)||24);const lift=1+Math.min(S.wins,30)*.004;
+  const names=[...BOTNAMES].sort(()=>Math.random()-.5);const mult=[.8,.97,1.13].sort(()=>Math.random()-.5);
+  const bots=mult.map((m,k)=>({name:names[k],color:BOTCOLORS[(k+S.races)%BOTCOLORS.length],wpm:base*m*lift*(.95+Math.random()*.1),pos:0,noise:0,fin:null}));
+  R={text,words:text.split(' '),wi:0,committed:0,good:0,errNow:0,keys:0,typos:0,state:'count',t0:0,t:0,bots,ghost:S.ghost,samples:[],lastSample:0,fin:null};
+  persist();
+  // lanes
+  const lanes=$('#lanes');lanes.innerHTML='';
+  const rows=[{name:'You',color:PAINTS[S.color][1],me:true},...(R.ghost?[{name:'Your best · '+R.ghost.wpm,color:PAINTS[S.color][1],ghost:true}]:[]),...bots.map(b=>({name:b.name,color:b.color}))];
+  rows.forEach(r=>{const l=document.createElement('div');l.className='lane';l.innerHTML=`<span class="nm">${r.name}</span><div class="car${r.me?' me':''}${r.ghost?' ghost':''}">${carSVG(r.color)}</div>`;lanes.appendChild(l);r.el=l.querySelector('.car')});
+  R.cars=rows;
+  inp.value='';inp.classList.remove('bad');
+  $('#res').classList.remove('show');$('#home').classList.add('hidden');$('#race').classList.remove('hidden');
+  renderText();updLive();layoutTrack();
+  inp.focus({preventScroll:true});
+  // countdown
+  const c=$('#count');c.classList.remove('hidden');let n=3;c.textContent=n;tone(440,.15,.05,'square');
+  clearInterval(R.cd);R.cd=setInterval(()=>{n--;if(n>0){c.textContent=n;tone(440,.15,.05,'square')}else{clearInterval(R.cd);c.textContent='GO!';tone(880,.3,.05,'square');R.state='run';R.t0=performance.now();inp.value='';setTimeout(()=>c.classList.add('hidden'),450);requestAnimationFrame(loop)}},700);
+}
+let trackW=300;function layoutTrack(){const w=$('#track').clientWidth;if(w>0)trackW=w-44-18;placeCars()}
+function placeCars(){if(!R)return;const total=R.text.length;
+  R.cars.forEach((c,k)=>{let f=0;if(c.me)f=(R.committed+R.good)/total;else if(c.ghost)f=ghostAt(R.t);else f=R.bots[k-(R.ghost?2:1)].pos/total;
+    c.el.style.transform=`translateX(${Math.min(1,f)*trackW}px)`})}
+function ghostAt(t){const g=R.ghost;if(!g)return 0;const i=Math.floor(t/.25);return i>=g.s.length?1:g.s[i]}
+function norm(v){return S.easy?v.toLowerCase():v.replace(/[‘’]/g,"'").replace(/[“”]/g,'"')}
+inp.addEventListener('input',e=>{
+  if(!R||R.state!=='run'){inp.value='';return}
+  let v=norm(inp.value);const before=R.errNow;
+  if(e.inputType&&e.inputType.startsWith('insert'))R.keys+=(e.data||'x').length;
+  // commit finished words (works for swipe typing too)
+  for(;;){const last=R.wi===R.words.length-1;const target=R.words[R.wi]+(last?'':' ');
+    if(v.startsWith(target)){v=v.slice(target.length);R.committed+=target.length;R.wi++;tone(620+Math.random()*80,.05,.025);if(R.wi>=R.words.length){inp.value='';R.good=0;R.errNow=0;finish();return}}else break}
+  if(inp.value!==v)inp.value=v;
+  const target=R.words[R.wi]+(R.wi===R.words.length-1?'':' ');let k=0;while(k<v.length&&k<target.length&&v[k]===target[k])k++;
+  R.good=k;R.errNow=v.length-k;
+  if(R.errNow>before){R.typos+=R.errNow-before;tone(150,.09,.05,'triangle');buzz(25)}
+  inp.classList.toggle('bad',R.errNow>0);renderText();
+});
+inp.addEventListener('keydown',e=>{if(e.key==='Enter')e.preventDefault()});
+inp.addEventListener('blur',()=>{if(R&&R.state!=='done'&&!$('#race').classList.contains('hidden'))$('#tapkb').classList.remove('hidden')});
+inp.addEventListener('focus',()=>{$('#tapkb').classList.add('hidden');window.scrollTo(0,0)});
+$('#text').addEventListener('click',()=>inp.focus());$('#track').addEventListener('click',()=>inp.focus());
+
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+function renderText(){const t=R.text,p=R.committed,g=R.good,e=R.errNow;
+  const cur=R.words[R.wi]||'';const wEnd=p+cur.length;
+  const a=esc(t.slice(0,p)),b=esc(t.slice(p,p+g)),c=esc(t.slice(p+g,p+g+e)),d1=esc(t.slice(p+g+e,Math.max(wEnd,p+g+e))),d2=esc(t.slice(Math.max(wEnd,p+g+e)));
+  $('#text').innerHTML=`<span class="done">${a}</span><span class="cur"><span class="ok">${b}</span><span class="err">${c.replace(/ /g,'&nbsp;')}</span><span class="caret"></span>${d1}</span>${d2}`;
+  const car=$('#text .caret');if(car){const box=$('#text');const top=car.offsetTop-box.offsetTop;if(top>box.scrollTop+box.clientHeight-34||top<box.scrollTop)box.scrollTop=top-10}}
+function wpmNow(){const m=R.t/60;return m>0.01?Math.round((R.committed+R.good)/5/m):0}
+function acc(){return R.keys?Math.max(0,Math.round(100*(R.keys-R.typos)/R.keys)):100}
+function place(){const me=R.committed+R.good;let p=1;R.bots.forEach(b=>{if(b.fin!=null||b.pos>me)p++});return p}
+const ord=n=>n+(['th','st','nd','rd'][n]||'th');
+function updLive(){$('#lWpm').textContent=R.state==='run'||R.state==='done'?wpmNow():0;$('#lPlace').textContent=R.state==='count'?'–':ord(place());$('#lAcc').textContent=acc()+'%';$('#lTime').textContent=R.t.toFixed(1)}
+let lastF=0;
+function loop(now){if(!R||R.state!=='run')return;const dt=lastF?Math.min(.05,(now-lastF)/1000):0;lastF=now;R.t=(now-R.t0)/1000;
+  const total=R.text.length;
+  R.bots.forEach(b=>{if(b.fin!=null)return;b.noise+=(Math.random()-.5)*dt*3;b.noise=Math.max(-1,Math.min(1,b.noise*.995));
+    const cps=b.wpm*5/60*(1+.28*b.noise);b.pos+=Math.max(0,cps)*dt;if(b.pos>=total){b.pos=total;b.fin=R.t}});
+  if(R.t-R.lastSample>=.25){R.lastSample+=.25;R.samples.push((R.committed+R.good)/total)}
+  placeCars();updLive();requestAnimationFrame(loop)}
+function finish(){R.state='done';R.t=(performance.now()-R.t0)/1000;R.samples.push(1);lastF=0;
+  const wpm=Math.round(R.text.length/5/(R.t/60));const a=acc();const pl=1+R.bots.filter(b=>b.fin!=null&&b.fin<R.t).length;
+  const prevBest=S.best;const prevWins=S.wins;
+  S.races++;if(pl===1)S.wins++;S.hist.push(wpm);if(S.hist.length>200)S.hist=S.hist.slice(-200);
+  let newBest=false;if(wpm>S.best){S.best=wpm;S.ghost={wpm,s:R.samples.map(x=>+x.toFixed(3))};newBest=true}
+  persist();placeCars();updLive();
+  [523,659,784,1047].forEach((f,k)=>tone(f,.3,.04,'square',k*.08));buzz([30,50,30]);
+  $('#oPlace').textContent=['','1st 🏆','2nd 🥈','3rd 🥉','4th 🏁'][pl];
+  $('#oWpm').textContent=wpm;$('#oAcc').textContent=a+'%';$('#oTime').textContent=R.t.toFixed(1)+'s';$('#oErr').textContent=R.typos;
+  const badges=[];if(newBest)badges.push(`<span class="badge">🔥 New personal best${prevBest?` (+${wpm-prevBest})`:''}</span>`);
+  PAINTS.forEach(p=>{if(p[2]>prevWins&&p[2]<=S.wins)badges.push(`<span class="badge pink">🎨 Unlocked ${p[0]} paint</span>`)});
+  const oldRank=rankOf(prevBest),nr=rankOf(S.best);if(nr.name!==oldRank.name&&S.best>0)badges.push(`<span class="badge">${nr.icon} Ranked up to ${nr.name}</span>`);
+  $('#oBadges').innerHTML=badges.join('');
+  $('#oPodium').innerHTML=R.bots.map(b=>`${b.name}: <b>${Math.round(b.wpm)} wpm</b>`).join(' · ');
+  setTimeout(()=>$('#res').classList.add('show'),600)}
+
+// ---------- home ----------
+const RANKS=[[0,'Rookie','🔰'],[20,'Street Racer','🛞'],[30,'Pro','⚡'],[40,'Elite','🔥'],[55,'Champion','🏆'],[70,'Legend','👑']];
+function rankOf(b){let r=RANKS[0];for(const x of RANKS)if(b>=x[0])r=x;const i=RANKS.indexOf(r);return{name:r[1],icon:r[2],next:RANKS[i+1]}}
+function renderHome(){const r=rankOf(S.best);$('#rName').textContent=r.name;$('#rIcon').textContent=r.icon;
+  $('#rNext').textContent=S.races?(r.next?`Hit ${r.next[0]} wpm to reach ${r.next[1]}`:'Top rank. Legendary thumbs.'):'Finish a race to get ranked';
+  $('#kBest').textContent=S.best;$('#kAvg').textContent=Math.round(avgRecent(10));$('#kRaces').textContent=S.races;$('#kWins').textContent=S.wins;
+  const h=S.hist.slice(-30),sp=$('#spark');
+  if(h.length<2)sp.innerHTML=`<text x="150" y="40" fill="#8d89a6" font-size="12" text-anchor="middle">Your WPM chart appears after 2 races</text>`;
+  else{const mx=Math.max(...h)*1.1,mn=Math.min(...h)*.85,pts=h.map((v,i)=>[i/(h.length-1)*296+2,66-(v-mn)/(mx-mn||1)*60]);
+    const d=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');const lp=pts[pts.length-1];
+    sp.innerHTML=`<defs><linearGradient id="g" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ff3d81" stop-opacity=".35"/><stop offset="1" stop-color="#ff3d81" stop-opacity="0"/></linearGradient></defs><path d="${d} L298 70 L2 70Z" fill="url(#g)"/><path d="${d}" fill="none" stroke="#ff3d81" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="${lp[0]}" cy="${lp[1]}" r="3" fill="#fff"/>`}
+  $('#heroCar').innerHTML='<div class="speedlines"></div>'+carSVG(PAINTS[S.color][1]);$('#heroCar').style.color=PAINTS[S.color][1];
+  const g=$('#garage');g.innerHTML='';PAINTS.forEach((p,i)=>{const ok=S.wins>=p[2];const b=document.createElement('button');b.className='paint'+(i===S.color?' on':'')+(ok?'':' locked');
+    b.innerHTML=carSVG(p[1])+(ok?p[0]:`🔒 ${p[2]} wins`);b.onclick=()=>{if(!ok){tone(160,.1,.04,'triangle');return}S.color=i;persist();renderHome();tone(700,.08)};g.appendChild(b)});
+  const sel=(id,val)=>$(id).querySelectorAll('.chip').forEach(b=>b.classList.toggle('on',b.dataset.v===val));
+  sel('#cPack',S.pack);sel('#cEasy',S.easy?'1':'0');sel('#cSound',S.sound?'1':'0')}
+const chipGroup=(id,fn)=>$(id).querySelectorAll('.chip').forEach(b=>b.onclick=()=>{fn(b.dataset.v);persist();renderHome()});
+chipGroup('#cPack',v=>S.pack=v);chipGroup('#cEasy',v=>S.easy=v==='1');chipGroup('#cSound',v=>S.sound=v==='1');
+function goHome(){if(R){clearInterval(R.cd);R.state='done'}R=null;inp.blur();$('#res').classList.remove('show');$('#race').classList.add('hidden');$('#home').classList.remove('hidden');renderHome()}
+$('#bRace').onclick=newRace;$('#oAgain').onclick=newRace;$('#oHome').onclick=goHome;$('#bQuit').onclick=goHome;
+renderHome();fitVV();
+
+// ---------- offline ----------
+const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+if(!standalone&&/iPhone|iPad|iPod/.test(navigator.userAgent))$('#a2hs').textContent='Tip: Share → Add to Home Screen for a full screen app.';
+if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready).then(()=>{$('#offline').innerHTML='<span class="ok">✓ Ready to play offline</span>'}).catch(()=>{$('#offline').textContent='Offline mode unavailable. Keep this tab open.'})}
+else $('#offline').textContent='Keep this tab open to play offline.';
+window.__rally={get R(){return R},S};
+})();
+</script>
+</body>
+</html>
