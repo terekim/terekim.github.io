@@ -375,7 +375,10 @@ $('#text').addEventListener('click',()=>inp.focus());$('#track').addEventListene
 const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
 function renderText(){const t=R.text,p=R.committed,g=R.good,e=R.errNow,cur=R.words[R.wi]||'',end=Math.max(p+cur.length,p+g+e);
   $('#text').innerHTML=`<span class="done">${esc(t.slice(0,p))}</span><span class="cur">${esc(t.slice(p,p+g))}<span class="err">${esc(t.slice(p+g,p+g+e)).replace(/ /g,'&nbsp;')}</span><span class="caret"></span>${esc(t.slice(p+g+e,end))}</span>${esc(t.slice(end))}`;
-  const c=$('#text .caret');if(c){const b=$('#text'),top=c.offsetTop-b.offsetTop;if(top>b.scrollTop+b.clientHeight-36||top<b.scrollTop)b.scrollTop=top-10}}
+  // keep the current line near the top so the next line is always visible
+  const c=$('#text .caret');if(c){const b=$('#text'),lh=parseFloat(getComputedStyle(b).lineHeight)||31,
+    top=c.getBoundingClientRect().top-b.getBoundingClientRect().top+b.scrollTop-b.clientTop;
+    if(top+lh*2>b.scrollTop+b.clientHeight||top<b.scrollTop)b.scrollTop=Math.max(0,top-lh*.5)}}
 const wpmNow=()=>{const m=R.t/60;return m>.01?Math.round((R.committed+R.good)/5/m):0};
 const acc=()=>R.keys?Math.max(0,Math.round(100*(R.keys-R.typos)/R.keys)):100;
 const plc=()=>{const me=R.committed+R.good;let p=1;R.bots.forEach(b=>{if(b.fin!=null||b.pos>me)p++});return p};
