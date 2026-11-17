@@ -347,7 +347,7 @@ function finish(){R.state='done';R.t=(performance.now()-R.t0)/1000;lastF=0;const
   $('#rStamps').innerHTML=stamps.map(s=>`<span class="stamp">${s}</span>`).join('');
   const field=[{id:R.me,name:'You',fin:R.t,wpm,me:1},...R.bots.map(b=>({id:b.id,name:GANG[b.id].name,fin:b.fin,wpm:Math.round(b.wpm)}))].sort((x,y)=>x.fin-y.fin);
   $('#rBoard').innerHTML='<span class="lbl">Results</span>'+field.map((f,i)=>`<div class="brow${f.me?' me':''}"><span class="n">${i+1}</span><img src="${kartSrc(f.id)}" alt=""><span>${f.name}</span><span class="w">${f.wpm} wpm</span></div>`).join('');
-  R.card={mode:R.mode,no:dayNum(),place:pl,wpm,acc:a,driver:R.me,ids:[R.me,...R.bots.map(b=>b.id)],trail:R.trail,fins:R.bots.map(b=>b.fin),tEnd:R.t};
+  R.card={text:R.text,mode:R.mode,no:dayNum(),place:pl,wpm,acc:a,driver:R.me,ids:[R.me,...R.bots.map(b=>b.id)],trail:R.trail,fins:R.bots.map(b=>b.fin),tEnd:R.t};
   $('#rCard').innerHTML=`<span class="logo">Thumb Rally</span><small>${R.mode==='daily'?'Track no. '+dayNum():'Practice race'}</small><img src="${faceSrc(R.me)}" alt=""><div class="big">${pl}${sfx(pl)}!<br>${wpm} wpm</div><small>${a}% accuracy<br>terekim.github.io/thumbrally</small>`;
   setTimeout(()=>{inp.blur();$('#res').scrollTop=0;$('#res').classList.add('show')},800)}
 
@@ -388,12 +388,26 @@ async function makeReplay(c){
   const dots=document.createElement('canvas');dots.width=W;dots.height=H;const dx=dots.getContext('2d');
   dx.fillStyle='#4E9A93';dx.fillRect(0,0,W,H);dx.fillStyle='rgba(33,28,24,.2)';for(let yy=0;yy<H;yy+=26)for(let xx=(yy/26%2)*13;xx<W;xx+=26){dx.beginPath();dx.arc(xx,yy,4.2,0,7);dx.fill()}
   const out=(t,px,py,size,fill,rot=0)=>{x.save();x.translate(px,py);x.rotate(rot);x.font=`${size}px "Bowlby One", Impact, sans-serif`;x.textAlign='center';x.lineJoin='round';x.fillStyle='#211C18';x.fillText(t,size*.06,size*.06);x.strokeStyle='#211C18';x.lineWidth=size*.09;x.strokeText(t,0,0);x.fillStyle=fill;x.fillText(t,0,0);x.restore()};
-  const top=420,laneH=210,left=40,finX=1000;
+  const top=360,laneH=196,left=40,finX=1000;
+  // wrap the passage once for the typing panel
+  x.font='600 50px "Shantell Sans", sans-serif';const words=(c.text||'').split(' '),lines=[];let cur='',starts=[0],idx=0;
+  words.forEach((w,i)=>{const t=cur?cur+' '+w:w;if(x.measureText(t).width>940&&cur){lines.push(cur);idx+=cur.length+1;starts.push(idx);cur=w}else cur=t});if(cur)lines.push(cur);
+  function typing(chars,t){const BX=40,BY=1440,BW=W-80,BH=320;
+    x.fillStyle='#FBF1DD';x.fillRect(BX,BY,BW,BH);x.strokeStyle='#211C18';x.lineWidth=10;x.strokeRect(BX,BY,BW,BH);
+    let li=0;for(let i=0;i<lines.length;i++)if(starts[i]<=chars)li=i;const first=Math.max(0,Math.min(li-1,lines.length-3));
+    x.font='600 50px "Shantell Sans", sans-serif';x.textAlign='left';x.textBaseline='alphabetic';
+    for(let k=0;k<3&&first+k<lines.length;k++){const i=first+k,L=lines[i],st=starts[i],y=BY+86+k*92,typed=Math.max(0,Math.min(L.length,chars-st));
+      // current word highlight
+      if(chars>=st&&chars<=st+L.length){const ws=L.lastIndexOf(' ',typed-1)+1,we=(L.indexOf(' ',typed)+1||L.length+1)-1;
+        const x1=BX+30+x.measureText(L.slice(0,ws)).width,x2=BX+30+x.measureText(L.slice(0,we)).width;x.fillStyle='#D9A93A';x.fillRect(x1-4,y-46,x2-x1+8,62)}
+      const a=L.slice(0,typed),b=L.slice(typed);x.fillStyle='#211C18';x.fillText(a,BX+30,y);const aw=x.measureText(a).width;x.fillStyle='rgba(33,28,24,.38)';x.fillText(b,BX+30+aw,y);
+      if(chars>=st&&chars<=st+L.length&&chars<(c.text||'').length&&Math.floor(t*3)%2===0){x.fillStyle='#B23F2C';x.fillRect(BX+30+aw,y-46,6,60)}}
+    x.textBaseline='alphabetic'}
   const names=c.ids.map((id,i)=>i===0?'YOU':GANG[id].name.toUpperCase());
   function frame(t){
     x.drawImage(dots,0,0);
-    out('THUMB RALLY',W/2,190,112,'#FBF1DD',-.04);
-    x.font='800 40px "Shantell Sans", sans-serif';x.fillStyle='#FBF1DD';x.textAlign='center';x.fillText((c.mode==='daily'?'TRACK NO. '+c.no:'PRACTICE RACE')+' · FINAL STRETCH',W/2,280);
+    out('THUMB RALLY',W/2,170,112,'#FBF1DD',-.04);
+    x.font='800 40px "Shantell Sans", sans-serif';x.fillStyle='#FBF1DD';x.textAlign='center';x.fillText((c.mode==='daily'?'TRACK NO. '+c.no:'PRACTICE RACE')+' · FINAL STRETCH',W/2,262);
     // track
     x.fillStyle='#E4CB9E';x.fillRect(20,top-20,W-40,laneH*5+40);
     x.fillStyle='rgba(33,28,24,.12)';for(let yy=top-20;yy<top+laneH*5+20;yy+=14)for(let xx=24+(yy%28?7:0);xx<W-24;xx+=14){x.fillRect(xx,yy,2.4,2.4)}
@@ -404,17 +418,18 @@ async function makeReplay(c){
     const tt=Math.min(t,tEnd),pos=at(tt),prev=at(Math.max(t0,tt-.15));
     x.save();x.beginPath();x.rect(26,top-14,W-52,laneH*5+28);x.clip();
     pos.forEach((p,i)=>{const img=imgs[c.ids[i]];if(!img)return;const kh=laneH*.92,kw=kh*img.width/img.height;
-      const f=Math.min(1,(p-p0)/(1-p0));const xx=left+f*(finX-left-kw+30),yy=top+i*laneH+laneH-kh-4;
+      const f=Math.max(-.015,Math.min(1,(p-p0)/(1-p0)));const xx=left+f*(finX-left-kw+30),yy=top+i*laneH+laneH-kh-4;
       const moving=p-prev[i]>.0005&&t<tEnd;
       x.font='800 30px "Shantell Sans", sans-serif';x.textAlign='right';x.fillStyle=i===0?'#211C18':'rgba(33,28,24,.55)';x.fillText(names[i],finX-20,top+i*laneH+44);
       if(moving){x.strokeStyle='#211C18';x.lineWidth=6;x.lineCap='round';for(let s=0;s<3;s++){const ly=yy+kh*(.45+s*.15),lx=xx-20-((t*900+s*90+i*40)%120);x.beginPath();x.moveTo(lx,ly);x.lineTo(lx-50,ly);x.stroke()}}
       const bob=moving?Math.sin(t*40+i)*4:0;x.drawImage(img,xx,yy+bob,kw,kh)});
     x.restore();
     if(t>=tEnd&&t<tEnd+.6){const k=(t-tEnd)/.6;x.save();x.globalAlpha=1-k;x.translate(W/2,top+laneH*2.5);x.rotate(-.08);x.scale(.8+k*.6,.8+k*.6);out('FINISH!',0,40,170,'#D9A93A');x.restore()}
-    if(t>=tEnd){const k=Math.min(1,(t-tEnd)/.25),sc=.4+.6*k+Math.sin(Math.min(1,k)*Math.PI)*.15;
-      x.save();x.translate(W/2,1720);x.scale(sc,sc);out(`${c.place}${sfx(c.place).toUpperCase()}! ${c.wpm} WPM`,0,0,110,'#FBF1DD',-.04);x.restore()}
-    else{x.font='800 44px "Shantell Sans", sans-serif';x.fillStyle='#FBF1DD';x.textAlign='center';x.fillText((Math.max(0,tEnd-t)).toFixed(1)+'s to the line',W/2,1700)}
-    x.font='800 34px "Shantell Sans", sans-serif';x.fillStyle='#FBF1DD';x.textAlign='center';x.fillText('terekim.github.io/thumbrally',W/2,1860)
+    typing(Math.round(Math.min(1,at(Math.min(t,tEnd))[0])*(c.text||'').length),t);
+    if(t<tEnd){x.font='800 40px "Shantell Sans", sans-serif';x.fillStyle='#FBF1DD';x.textAlign='center';x.fillText((Math.max(0,tEnd-t)).toFixed(1)+'s to the line',W/2,1412)}
+    if(t>=tEnd+.45){const k=Math.min(1,(t-tEnd-.45)/.25),sc=.4+.6*k+Math.sin(Math.min(1,k)*Math.PI)*.15;
+      x.save();x.translate(W/2,top+laneH*2.5+40);x.scale(sc,sc);out(`${c.place}${sfx(c.place).toUpperCase()}! ${c.wpm} WPM`,0,0,110,'#FBF1DD',-.04);x.restore()}
+    x.font='800 34px "Shantell Sans", sans-serif';x.fillStyle='#FBF1DD';x.textAlign='center';x.fillText('terekim.github.io/thumbrally',W/2,1840)
   }
   frame(t0);
   if(!cv.captureStream||!window.MediaRecorder)throw new Error('norec');
