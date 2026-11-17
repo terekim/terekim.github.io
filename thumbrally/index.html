@@ -487,7 +487,7 @@ function renderHome(){
     $('#dailyCta').innerHTML=`<div class="today"><div><div class="dtitle" style="font-size:30px">${td.place}${sfx(td.place)} · ${td.wpm} wpm</div><div class="lbl" style="margin-top:4px">${td.acc}% accuracy</div></div></div>`;
     $('#dRule').textContent='Next track in '+untilTomorrow()+'. Practice all you want until then.'}
   else{st.textContent='Open';st.classList.remove('done');
-    $('#dailyCta').innerHTML=`<button class="btn go" id="bDaily">Race today's track</button>`;$('#bDaily').onclick=()=>startRace('daily');
+    $('#dailyCta').innerHTML=`<button class="btn go" id="bDaily">Start today's race</button>`;$('#bDaily').onclick=()=>startRace('daily');
     $('#dRule').textContent='Type the passage. Beat the gang. One official run a day, same track for everyone.'}
   $('#picker').innerHTML=IDS.map(id=>`<button class="pick${id===S.driver?' on':''}" data-id="${id}" aria-pressed="${id===S.driver}"><img src="${kartSrc(id)}" alt=""><span>${GANG[id].name.replace('Sir Ringsley','Sir R.').replace('Pops Pointer','Pops')}</span></button>`).join('');
   $('#pickName').textContent=GANG[S.driver].name;
