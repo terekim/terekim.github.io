@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Shantell+Sans:wght@400;600;800&display=swap">
-<link rel="preload" as="image" href="img/kart-thumbs.webp">
+<link rel="preload" as="image" href="img/kart-thumbs.webp"><link rel="preload" as="image" href="img/kart-pops.webp"><link rel="preload" as="image" href="img/kart-birdie.webp"><link rel="preload" as="image" href="img/kart-sir.webp"><link rel="preload" as="image" href="img/kart-lil.webp">
 <style>
 :root{
   --paper:#EEDBB8;--paper2:#E4CB9E;--card:#FBF1DD;--ink:#211C18;--ink2:#6A5B48;
@@ -97,7 +97,7 @@ svg.defs{position:absolute;width:0;height:0}
 .lane .nm{position:absolute;right:22px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:800;color:var(--ink2);text-transform:uppercase;white-space:nowrap;opacity:.8}
 .lane.me{background:rgba(217,169,58,.22)}
 .lane.me .nm{color:var(--ink);opacity:1}
-.kart{position:absolute;left:2px;bottom:1px;height:calc(var(--laneH,46px) - 2px);will-change:transform;z-index:2}
+.kart{position:absolute;left:2px;bottom:-1px;height:calc(var(--laneH,46px) + 8px);will-change:transform;z-index:2}
 .kart img{height:100%;width:auto;transform-origin:30% 90%}
 .kart.run img{animation:bump .14s ease-in-out infinite alternate}
 .kart .puff{position:absolute;left:-6px;bottom:2px;width:14px;height:14px;border-radius:50%;background:#E8D4AE;border:2px solid var(--ink);opacity:0}
@@ -136,7 +136,7 @@ svg.defs{position:absolute;width:0;height:0}
 #res.show{transform:none}
 #res>*{flex:none}
 .react{display:flex;align-items:center;gap:6px;min-height:130px}
-.react img{width:122px;flex:none;transform:rotate(-3deg)}
+.react img{width:150px;flex:none;transform:rotate(-3deg)}
 .react.shake img{animation:wob .5s ease-in-out 2}
 @keyframes wob{25%{transform:rotate(-8deg)}75%{transform:rotate(4deg)}}
 .say{position:relative;flex:1;padding:16px 16px;font-weight:800;font-size:14px;text-transform:uppercase;line-height:1.2;text-align:center;background:var(--card);border-radius:50%/42%}
@@ -238,7 +238,7 @@ const GANG={
 };
 const IDS=Object.keys(GANG);
 if(!GANG[S.driver])S.driver='thumbs';
-const kartSrc=id=>`img/kart-${id}.webp`, faceSrc=id=>`img/face-${id}.webp`;
+const kartSrc=id=>`img/kart-${id}.webp`, faceSrc=id=>`img/big-${id}.webp`;
 const BOT={thumbs:{m:1.02,noise:.35},pops:{m:.94,noise:.12},birdie:{m:1.0,noise:.5},sir:{m:.86,noise:.22},lil:{m:1.1,noise:.65}};
 const TALK={
   thumbs:{win:['FIRST. obviously. did everyone see that?','they should name a highway after me'],close:['so close i can taste the trophy'],lose:['the helmet was too tight. that is the only reason.'],pb:['NEW PERSONAL BEST. frame it.'],beat:['you got beat by a THUMB. on purpose.']},
@@ -288,11 +288,11 @@ function startRace(mode){
     R.rows.forEach(r=>r.el.classList.add('run'));setTimeout(()=>c.classList.add('hidden'),450);requestAnimationFrame(loop)}},700);
 }
 function pickPractice(){let pool=PASS.map((t,i)=>i).filter(i=>!S.recent.includes(i));if(!pool.length)pool=PASS.map((t,i)=>i);const i=pick(pool);S.recent=[i,...S.recent].slice(0,15);save();return PASS[i]}
-let trackW=300,kartW=66;
+let trackFull=300;
 function layoutTrack(){const t=$('#track'),w=t.clientWidth;
   const vh=(window.visualViewport?visualViewport.height:innerHeight);const laneH=Math.max(34,Math.min(48,Math.floor((vh-250)/5)));
-  t.style.setProperty('--laneH',laneH+'px');kartW=Math.round((laneH-2)*1.52);if(w>0)trackW=w-kartW-18;place()}
-function place(){if(!R)return;const T=R.text.length;R.rows.forEach((r,k)=>{const f=r.me?(R.committed+R.good)/T:R.bots[k-1].pos/T;r.el.style.transform=`translateX(${Math.min(1,f)*trackW}px)`;
+  t.style.setProperty('--laneH',laneH+'px');if(w>0)trackFull=w;place()}
+function place(){if(!R)return;const T=R.text.length;R.rows.forEach((r,k)=>{const f=r.me?(R.committed+R.good)/T:R.bots[k-1].pos/T;const kw=r.el.offsetWidth||60;r.el.style.transform=`translateX(${Math.min(1,f)*(trackFull-kw-18)}px)`;
   if((r.me?R.state==='done':R.bots[k-1].fin!=null))r.el.classList.remove('run')})}
 function sputter(){const el=R.rows[0].el;el.classList.remove('sputter');void el.offsetWidth;el.classList.add('sputter');const s=$('#sfx');s.textContent=pick(['Sputter!','Clunk!','Oops!','Bonk!']);s.classList.remove('show');void s.offsetWidth;s.classList.add('show')}
 inp.addEventListener('input',e=>{
@@ -344,7 +344,7 @@ function finish(){R.state='done';R.t=(performance.now()-R.t0)/1000;lastF=0;const
   const field=[{id:R.me,name:'You',fin:R.t,wpm,me:1},...R.bots.map(b=>({id:b.id,name:GANG[b.id].name,fin:b.fin,wpm:Math.round(b.wpm)}))].sort((x,y)=>x.fin-y.fin);
   $('#rBoard').innerHTML='<span class="lbl">Results</span>'+field.map((f,i)=>`<div class="brow${f.me?' me':''}"><span class="n">${i+1}</span><img src="${kartSrc(f.id)}" alt=""><span>${f.name}</span><span class="w">${f.wpm} wpm</span></div>`).join('');
   R.card={mode:R.mode,no:dayNum(),place:pl,wpm,acc:a,driver:R.me};
-  $('#rCard').innerHTML=`<span class="logo">Thumb Rally</span><small>${R.mode==='daily'?'Track no. '+dayNum():'Practice race'}</small><img src="${kartSrc(R.me)}" alt=""><div class="big">${pl}${sfx(pl)}!<br>${wpm} wpm</div><small>${a}% accuracy<br>terekim.github.io/thumbrally</small>`;
+  $('#rCard').innerHTML=`<span class="logo">Thumb Rally</span><small>${R.mode==='daily'?'Track no. '+dayNum():'Practice race'}</small><img src="${faceSrc(R.me)}" alt=""><div class="big">${pl}${sfx(pl)}!<br>${wpm} wpm</div><small>${a}% accuracy<br>terekim.github.io/thumbrally</small>`;
   setTimeout(()=>{inp.blur();$('#res').scrollTop=0;$('#res').classList.add('show')},800)}
 
 const loadImg=src=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=src});
@@ -358,7 +358,7 @@ async function cardBlob(c){
     x.fillStyle='#211C18';x.fillText(t,size*.06,size*.06);x.strokeStyle='#211C18';x.lineWidth=size*.09;x.strokeText(t,0,0);x.fillStyle=fill;x.fillText(t,0,0);x.restore()};
   outlined('THUMB RALLY',W/2,210,118,'#FBF1DD',-.05);
   x.font='800 40px "Shantell Sans", sans-serif';x.fillStyle='#FBF1DD';x.textAlign='center';x.fillText((c.mode==='daily'?'TRACK NO. '+c.no:'PRACTICE RACE'),W/2,300);
-  try{const k=await loadImg(kartSrc(c.driver));const kw=940,kh=kw*k.height/k.width;x.save();x.translate(W/2,760);x.rotate(-.04);x.drawImage(k,-kw/2,-kh/2,kw,kh);x.restore()}catch(e){}
+  try{const k=await loadImg(faceSrc(c.driver));const kw=Math.min(980,600*k.width/k.height),kh=kw*k.height/k.width;x.save();x.translate(W/2,730);x.rotate(-.04);x.drawImage(k,-kw/2,-kh/2,kw,kh);x.restore()}catch(e){}
   outlined(`${c.place}${sfx(c.place).toUpperCase()}!`,W/2,1290,250,'#FBF1DD',-.04);
   outlined(`${c.wpm} WPM`,W/2,1530,170,'#D9A93A',-.03);
   x.font='800 44px "Shantell Sans", sans-serif';x.fillStyle='#FBF1DD';x.fillText(`${c.acc}% ACCURACY`,W/2,1650);
