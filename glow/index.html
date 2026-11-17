@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#07080d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Glow">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<title>Glow</title>
+<style>
+:root{--bg:#07080d;--fg:#eef1ff;--dim:#8a90a8;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.1);--hue:190}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Rounded","Segoe UI",Roboto,sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;overscroll-behavior:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top) + 14px) 16px calc(env(safe-area-inset-bottom) + 14px)}
+.hidden{display:none!important}
+/* home */
+#home{overflow-y:auto;gap:18px;align-items:stretch}
+.brand{text-align:center;margin-top:5vh}
+.logo{font-size:56px;font-weight:800;letter-spacing:-2px;color:hsl(var(--hue) 95% 70%);text-shadow:0 0 24px hsl(var(--hue) 100% 55% / .8),0 0 60px hsl(var(--hue) 100% 50% / .45)}
+.tag{color:var(--dim);margin-top:4px;font-size:15px}
+.stats{display:flex;justify-content:center;gap:18px;color:var(--dim);font-size:13px;margin-top:10px}
+.stats b{color:var(--fg)}
+.btn{display:block;width:100%;padding:16px;border-radius:16px;background:var(--card);border:1px solid var(--line);font-size:17px;font-weight:650;text-align:center}
+.btn.primary{background:hsl(var(--hue) 90% 58%);color:#061018;border:0;box-shadow:0 0 28px hsl(var(--hue) 100% 55% / .45)}
+.btn small{display:block;font-weight:500;font-size:12px;opacity:.7;margin-top:2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px}
+.card h3{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin-bottom:10px;font-weight:650}
+.chips{display:flex;gap:8px;margin-bottom:10px}
+.chip{flex:1;padding:10px 0;border-radius:12px;border:1px solid var(--line);font-size:14px;font-weight:600;color:var(--dim)}
+.chip.on{color:var(--fg);border-color:hsl(var(--hue) 90% 60%);background:hsl(var(--hue) 90% 60% / .15)}
+#levels{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;max-height:40vh;overflow-y:auto}
+.lv{aspect-ratio:1;border-radius:10px;background:rgba(255,255,255,.05);font-size:14px;font-weight:650;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.lv i{font-style:normal;font-size:8px;letter-spacing:-1px;color:hsl(var(--hue) 95% 65%);margin-top:3px;height:8px}
+.lv.cur{outline:2px solid hsl(var(--hue) 90% 60%)}
+.foot{text-align:center;color:var(--dim);font-size:12px;line-height:1.6;padding-bottom:8px}
+.foot .ok{color:#7ee2a8}
+/* game */
+#game{gap:10px}
+.top{display:flex;align-items:center;justify-content:space-between;min-height:44px}
+.icon{width:44px;height:44px;border-radius:14px;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:20px}
+.title{text-align:center}
+.title b{font-size:18px;display:block}
+.title span{font-size:12px;color:var(--dim)}
+#boardWrap{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;position:relative}
+canvas{touch-action:none;display:block}
+#help{position:absolute;bottom:0;left:0;right:0;text-align:center;color:var(--dim);font-size:13px;pointer-events:none;transition:opacity .4s}
+.bar{display:flex;gap:10px}
+.bar .btn{padding:13px 0;font-size:15px}
+/* win */
+#win{position:fixed;inset:0;background:rgba(4,5,9,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .35s;pointer-events:none}
+#win.show{opacity:1;pointer-events:auto}
+.wincard{width:100%;max-width:340px;text-align:center;display:flex;flex-direction:column;gap:12px;transform:scale(.92);transition:transform .35s}
+#win.show .wincard{transform:scale(1)}
+.wt{font-size:30px;font-weight:800}
+.stars{font-size:42px;letter-spacing:6px;color:hsl(var(--hue) 95% 66%);text-shadow:0 0 18px hsl(var(--hue) 100% 55%)}
+.stars .off{color:rgba(255,255,255,.15);text-shadow:none}
+.wd{color:var(--dim);font-size:14px}
+</style>
+</head>
+<body>
+
+<section id="home" class="screen">
+  <div class="brand">
+    <div class="logo">Glow</div>
+    <div class="tag">Turn the tiles. Light every bulb.</div>
+    <div class="stats"><span><b id="sSolved">0</b> solved</span><span><b id="sStars">0</b> ★</span><span><b id="sStreak">0</b> zen</span></div>
+  </div>
+  <button class="btn primary" id="bContinue">Continue<small id="bContinueSub">Level 1</small></button>
+  <div class="card">
+    <h3>Zen mode · endless</h3>
+    <div class="chips" id="zSize">
+      <button class="chip" data-s="s">Small</button><button class="chip on" data-s="m">Medium</button><button class="chip" data-s="l">Large</button>
+    </div>
+    <div class="chips" id="zWrap">
+      <button class="chip on" data-w="0">Classic</button><button class="chip" data-w="1">Wrap edges</button>
+    </div>
+    <button class="btn" id="bZen">Play Zen</button>
+  </div>
+  <div class="card">
+    <h3>Levels</h3>
+    <div id="levels"></div>
+  </div>
+  <div class="card">
+    <h3>Settings</h3>
+    <div class="chips" id="sSound" style="margin:0"><button class="chip on" data-v="1">Sound on</button><button class="chip" data-v="0">Sound off</button></div>
+  </div>
+  <div class="foot"><span id="offline">Preparing offline mode…</span><br><span id="a2hs"></span></div>
+</section>
+
+<section id="game" class="screen hidden">
+  <div class="top">
+    <button class="icon" id="bHome" aria-label="Home">⌂</button>
+    <div class="title"><b id="gTitle">Level 1</b><span id="gSub">Moves 0 · Par 0</span></div>
+    <button class="icon" id="bRestart" aria-label="Restart">↻</button>
+  </div>
+  <div id="boardWrap"><canvas id="cv"></canvas><div id="help">Tap to rotate · Hold to lock a tile</div></div>
+  <div class="bar">
+    <button class="btn" id="bUndo">Undo</button>
+    <button class="btn" id="bHint">Hint</button>
+  </div>
+</section>
+
+<div id="win">
+  <div class="wincard">
+    <div class="wt" id="wT">Lit!</div>
+    <div class="stars" id="wS"></div>
+    <div class="wd" id="wD"></div>
+    <button class="btn primary" id="wNext">Next level</button>
+    <button class="btn" id="wHome">Home</button>
+  </div>
+</div>
+
+<script>
+(()=>{
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem('glow.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('glow.'+k,JSON.stringify(v))}catch(e){}}};
+const save=Object.assign({level:1,stars:{},solved:0,zen:0,sound:true,zs:'m',zw:0,seen:false},store.get('save',{}));
+const persist=()=>store.set('save',save);
+
+// directions: N E S W  -> [dx,dy,bit,oppositeBit]
+const DIRS=[[0,-1,1,4],[1,0,2,8],[0,1,4,1],[-1,0,8,2]];
+const rot=m=>((m<<1)|(m>>3))&15;
+const pop=m=>(m&1)+(m>>1&1)+(m>>2&1)+(m>>3&1);
+function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const hueFor=n=>(190+n*47)%360;
+
+function levelSpec(n){const w=Math.min(3+Math.ceil(n/4),8);const h=Math.min(w+Math.floor(n/6),12);return{w,h,wrap:n>=30&&n%2===0,seed:n*7919+13}}
+const ZEN={s:[5,7],m:[7,10],l:[8,12]};
+
+let G=null;
+function nb(i,d){const x=i%G.w,y=(i/G.w)|0;let nx=x+DIRS[d][0],ny=y+DIRS[d][1];
+  if(G.wrap){nx=(nx+G.w)%G.w;ny=(ny+G.h)%G.h}else if(nx<0||ny<0||nx>=G.w||ny>=G.h)return -1;return ny*G.w+nx}
+
+function build(spec,mode,level){
+  G={w:spec.w,h:spec.h,wrap:spec.wrap,mode,level,hue:mode==='zen'?(spec.seed%360):hueFor(level),moves:0,hints:0,undo:[],done:false,start:Date.now()};
+  const n=G.w*G.h,r=mulberry(spec.seed);
+  G.src=((G.h/2)|0)*G.w+((G.w/2)|0);
+  const sol=new Uint8Array(n),vis=new Uint8Array(n),fr=[];
+  const push=i=>{for(let d=0;d<4;d++){const j=nb(i,d);if(j>=0&&!vis[j])fr.push([i,j,d])}};
+  vis[G.src]=1;push(G.src);
+  while(fr.length){const k=(r()*fr.length)|0;const e=fr[k];fr[k]=fr[fr.length-1];fr.pop();const[i,j,d]=e;if(vis[j])continue;
+    // soften four way crosses so puzzles read cleanly
+    if(pop(sol[i])>=3&&r()<.75&&fr.some(f=>f[1]===j&&f[0]!==i))continue;
+    vis[j]=1;sol[i]|=DIRS[d][2];sol[j]|=DIRS[d][3];push(j)}
+  const tile=new Uint8Array(n);let par;
+  do{par=0;for(let i=0;i<n;i++){let m=sol[i];const k=(r()*4)|0;for(let t=0;t<k;t++)m=rot(m);tile[i]=m;let q=m,c=0;while(q!==sol[i]&&c<4){q=rot(q);c++}par+=c}}while(par===0);
+  Object.assign(G,{sol,tile,par,lock:new Uint8Array(n),anim:new Float32Array(n),lit:new Uint8Array(n)});
+  computeLit();
+}
+function computeLit(){const L=new Uint8Array(G.w*G.h),q=[G.src];L[G.src]=1;let c=1;
+  while(q.length){const i=q.pop();for(let d=0;d<4;d++)if(G.tile[i]&DIRS[d][2]){const j=nb(i,d);if(j>=0&&!L[j]&&(G.tile[j]&DIRS[d][3])){L[j]=1;c++;q.push(j)}}}
+  G.lit=L;G.litCount=c;return c===L.length}
+
+// ---------- rendering ----------
+const cv=$('#cv'),ctx=cv.getContext('2d');let cell=40,dpr=1,running=false,last=0;
+function layout(){if(!G)return;const wrap=$('#boardWrap');const aw=wrap.clientWidth,ah=wrap.clientHeight-22;
+  cell=Math.max(24,Math.floor(Math.min(aw/G.w,ah/G.h,84)));dpr=Math.min(window.devicePixelRatio||1,3);
+  cv.style.width=G.w*cell+'px';cv.style.height=G.h*cell+'px';cv.width=G.w*cell*dpr;cv.height=G.h*cell*dpr;draw()}
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function draw(){const s=cell,n=G.w*G.h;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,G.w*s,G.h*s);
+  for(let i=0;i<n;i++){const x=(i%G.w)*s,y=((i/G.w)|0)*s;ctx.fillStyle=G.lock[i]?'rgba(255,255,255,.10)':'rgba(255,255,255,.03)';rr(x+2,y+2,s-4,s-4,s*.18);ctx.fill();
+    if(G.lock[i]){ctx.strokeStyle=`hsl(${G.hue} 80% 60% / .35)`;ctx.lineWidth=1;ctx.stroke()}}
+  for(let pass=0;pass<2;pass++)for(let i=0;i<n;i++)if((G.lit[i]?1:0)===pass)drawTile(i)}
+function drawTile(i){const s=cell,m=G.tile[i],lit=G.lit[i],h=G.hue;
+  ctx.save();ctx.translate((i%G.w)*s+s/2,((i/G.w)|0)*s+s/2);ctx.rotate(-G.anim[i]);
+  const col=lit?`hsl(${h} 95% 66%)`:'#3a3f52';
+  ctx.lineCap='round';ctx.lineWidth=s*.16;ctx.strokeStyle=col;
+  if(lit){ctx.shadowColor=`hsl(${h} 100% 58%)`;ctx.shadowBlur=s*.4}
+  ctx.beginPath();for(let d=0;d<4;d++)if(m&DIRS[d][2]){ctx.moveTo(0,0);ctx.lineTo(DIRS[d][0]*s/2,DIRS[d][1]*s/2)}ctx.stroke();
+  if(i===G.src){ctx.fillStyle=`hsl(${h} 95% 66%)`;rr(-s*.24,-s*.24,s*.48,s*.48,s*.12);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(0,0,s*.09,0,7);ctx.fill()}
+  else if(pop(m)===1){ctx.beginPath();ctx.arc(0,0,s*.2,0,7);
+    if(lit){ctx.fillStyle=`hsl(${h} 100% 78%)`;ctx.fill()}else{ctx.shadowBlur=0;ctx.fillStyle='#07080d';ctx.fill();ctx.lineWidth=s*.07;ctx.stroke()}}
+  ctx.restore()}
+function kick(){if(!running){running=true;last=performance.now();requestAnimationFrame(tick)}}
+function tick(t){const dt=Math.min(.05,(t-last)/1000);last=t;let active=false;const k=Math.exp(-dt*20);
+  for(let i=0;i<G.anim.length;i++){if(G.anim[i]){G.anim[i]*=k;if(Math.abs(G.anim[i])<.004)G.anim[i]=0;else active=true}}
+  draw();if(active)requestAnimationFrame(tick);else running=false}
+
+// ---------- sound ----------
+let AC=null;
+function tone(f,d=.07,v=.04,type='sine',delay=0){if(!save.sound)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();
+  const t0=AC.currentTime+delay,o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(v,t0+.008);g.gain.exponentialRampToValueAtTime(.0001,t0+d);o.connect(g).connect(AC.destination);o.start(t0);o.stop(t0+d+.02)}catch(e){}}
+const buzz=ms=>{try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}};
+
+// ---------- actions ----------
+function hud(){$('#gTitle').textContent=G.mode==='zen'?'Zen':'Level '+G.level+(G.wrap?' · wrap':'');
+  $('#gSub').textContent=`Moves ${G.moves} · Par ${G.par} · ${Math.round(100*G.litCount/G.lit.length)}% lit`}
+function rotateTile(i){if(G.done)return;if(G.lock[i]){tone(140,.08,.03,'triangle');buzz(15);return}
+  G.tile[i]=rot(G.tile[i]);G.anim[i]+=Math.PI/2;G.moves++;G.undo.push(i);
+  const solved=computeLit();tone(420+500*G.litCount/G.lit.length,.06);hud();kick();
+  if(!save.seen){save.seen=true;persist();$('#help').style.opacity=0}
+  if(solved)win()}
+function toggleLock(i){if(G.done)return;G.lock[i]^=1;tone(G.lock[i]?300:240,.05,.03,'triangle');buzz(10);draw()}
+function undo(){if(G.done||!G.undo.length)return;const i=G.undo.pop();G.tile[i]=rot(rot(rot(G.tile[i])));G.anim[i]-=Math.PI/2;G.moves=Math.max(0,G.moves-1);computeLit();hud();kick();tone(330,.05)}
+function hint(){if(G.done)return;const c=[];for(let i=0;i<G.tile.length;i++)if(G.tile[i]!==G.sol[i])c.push(i);if(!c.length)return;
+  const i=c[(Math.random()*c.length)|0];let k=0;while(G.tile[i]!==G.sol[i]){G.tile[i]=rot(G.tile[i]);k++}G.anim[i]+=k*Math.PI/2;G.lock[i]=1;G.hints++;
+  const solved=computeLit();tone(880,.12,.04);hud();kick();if(solved)win()}
+function win(){G.done=true;const secs=Math.round((Date.now()-G.start)/1000);
+  let st=G.moves<=G.par?3:G.moves<=Math.ceil(G.par*1.6)+2?2:1;if(G.hints)st=Math.min(st,2);
+  save.solved++;
+  if(G.mode==='zen')save.zen++;else{const prev=save.stars[G.level]||0;save.stars[G.level]=Math.max(prev,st);if(G.level>=save.level)save.level=G.level+1}
+  persist();[523,659,784,1047].forEach((f,k)=>tone(f,.35,.05,'sine',k*.09));buzz([20,40,20]);
+  $('#wT').textContent=['','Lit!','Bright!','Brilliant!'][st];
+  $('#wS').innerHTML=[1,2,3].map(k=>k<=st?'★':'<span class="off">★</span>').join('');
+  $('#wD').textContent=`${G.moves} moves (par ${G.par}) · ${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')}${G.hints?` · ${G.hints} hint${G.hints>1?'s':''}`:''}`;
+  $('#wNext').textContent=G.mode==='zen'?'Another one':'Next level';
+  const me=G;setTimeout(()=>{if(G===me)$('#win').classList.add('show')},500)}
+
+function startLevel(n){build(levelSpec(n),'level',n);enterGame()}
+function startZen(){const[w,h]=ZEN[save.zs];build({w,h,wrap:!!save.zw,seed:(Math.random()*2**31)|0},'zen',0);enterGame()}
+function enterGame(){document.documentElement.style.setProperty('--hue',G.hue);$('#win').classList.remove('show');$('#home').classList.add('hidden');$('#game').classList.remove('hidden');
+  $('#help').style.opacity=save.seen?0:1;hud();requestAnimationFrame(layout)}
+function goHome(){$('#win').classList.remove('show');$('#game').classList.add('hidden');$('#home').classList.remove('hidden');renderHome()}
+
+// ---------- input ----------
+let press=null;
+function hit(e){const r=cv.getBoundingClientRect();const x=Math.floor((e.clientX-r.left)/cell),y=Math.floor((e.clientY-r.top)/cell);return x>=0&&y>=0&&x<G.w&&y<G.h?y*G.w+x:-1}
+cv.addEventListener('pointerdown',e=>{e.preventDefault();const i=hit(e);if(i<0)return;press={i,fired:false};press.timer=setTimeout(()=>{if(press){press.fired=true;toggleLock(press.i)}},380)});
+cv.addEventListener('pointerup',e=>{if(!press)return;clearTimeout(press.timer);if(!press.fired&&hit(e)===press.i)rotateTile(press.i);press=null});
+cv.addEventListener('pointercancel',()=>{if(press)clearTimeout(press.timer);press=null});
+cv.addEventListener('contextmenu',e=>e.preventDefault());
+addEventListener('resize',layout);
+
+$('#bHome').onclick=goHome;$('#wHome').onclick=goHome;
+$('#bRestart').onclick=()=>{if(G.mode!=='zen')return startLevel(G.level);if(G.done)return;while(G.undo.length)undo();G.lock.fill(0);G.moves=0;G.hints=0;G.start=Date.now();computeLit();hud();draw()};
+$('#bUndo').onclick=undo;$('#bHint').onclick=hint;
+$('#wNext').onclick=()=>G.mode==='zen'?startZen():startLevel(G.level+1);
+$('#bContinue').onclick=()=>startLevel(save.level);
+$('#bZen').onclick=startZen;
+const chipGroup=(sel,key,attr,parse)=>$(sel).querySelectorAll('.chip').forEach(b=>b.onclick=()=>{save[key]=parse(b.dataset[attr]);persist();renderHome()});
+chipGroup('#zSize','zs','s',v=>v);chipGroup('#zWrap','zw','w',v=>+v);chipGroup('#sSound','sound','v',v=>v==='1');
+
+function renderHome(){document.documentElement.style.setProperty('--hue',hueFor(save.level));
+  const stars=Object.values(save.stars).reduce((a,b)=>a+b,0);
+  $('#sSolved').textContent=save.solved;$('#sStars').textContent=stars;$('#sStreak').textContent=save.zen;
+  $('#bContinueSub').textContent='Level '+save.level+(levelSpec(save.level).wrap?' · wrap':'');
+  $('#zSize').querySelectorAll('.chip').forEach(b=>b.classList.toggle('on',b.dataset.s===save.zs));
+  $('#zWrap').querySelectorAll('.chip').forEach(b=>b.classList.toggle('on',+b.dataset.w===save.zw));
+  $('#sSound').querySelectorAll('.chip').forEach(b=>b.classList.toggle('on',(b.dataset.v==='1')===save.sound));
+  const L=$('#levels');L.innerHTML='';
+  for(let n=1;n<=save.level;n++){const b=document.createElement('button');b.className='lv'+(n===save.level?' cur':'');const s=save.stars[n]||0;
+    b.innerHTML=`${n}<i>${'★'.repeat(s)}</i>`;b.onclick=()=>startLevel(n);L.appendChild(b)}
+  if(save.level>30)L.scrollTop=L.scrollHeight}
+renderHome();
+
+// ---------- offline ----------
+const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+if(!standalone&&/iPhone|iPad|iPod/.test(navigator.userAgent))$('#a2hs').textContent='Tip: Share → Add to Home Screen for a full screen app.';
+if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready).then(()=>{$('#offline').innerHTML='<span class="ok">✓ Ready to play offline</span>'}).catch(()=>{$('#offline').textContent='Offline mode unavailable. Keep this tab open.'})}
+else $('#offline').textContent='Keep this tab open to play offline.';
+
+window.__glow={get G(){return G},startLevel,startZen,rotateTile,save};
+})();
+</script>
+</body>
+</html>
