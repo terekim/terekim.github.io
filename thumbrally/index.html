@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=resizes-content">
-<meta name="theme-color" content="#EEDBB8">
+<meta name="theme-color" content="#FAF5EC">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Typo Derby">
 <link rel="apple-touch-icon" href="img/icon-180.png">
@@ -278,7 +278,7 @@ const KEY='thumbrally.v1';
 let S={races:0,wins:0,best:0,hist:[],streak:0,lastDay:null,daily:null,recent:[],driver:'thumbs'};
 try{Object.assign(S,JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
-{const bg=new URLSearchParams(location.search).get('bg');if(bg==='white'||bg==='mid'){document.body.classList.add(bg);document.querySelector('meta[name=theme-color]').content=bg==='white'?'#FFFFFF':'#FAF5EC'}}
+{const bg=new URLSearchParams(location.search).get('bg')||'mid';if(bg==='white'||bg==='mid'){document.body.classList.add(bg);document.querySelector('meta[name=theme-color]').content=bg==='white'?'#FFFFFF':'#FAF5EC'}}
 
 const GANG={
   thumbs:{name:'Thumbs'},pops:{name:'Pops Pointer'},birdie:{name:'Birdie'},sir:{name:'Sir Ringsley'},lil:{name:'Lil Pink'}
