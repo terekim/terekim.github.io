@@ -35,6 +35,18 @@ svg.defs{position:absolute;width:0;height:0}
 #app{position:fixed;top:0;left:0;right:0;height:100%;display:flex;flex-direction:column;overflow:hidden}
 .hidden{display:none!important}
 
+/* white paper preview: ?bg=white */
+body.white{--paper:#FFFFFF;--paper2:#F4F1EC;--card:#FFFFFF;--ink2:#6B645C}
+body.white .paper{display:none}
+body.white #track,body.white .grid{background:radial-gradient(rgba(33,28,24,.09) 1px,transparent 1.3px) 0 0/6px 6px,var(--paper2)}
+body.white .lane.me,body.white .grid .gl.me{background:rgba(217,169,58,.18)}
+body.white #text{color:#A79C8E}
+body.white #count{background:rgba(255,255,255,.75)}
+body.white .pick{background:#FFFFFF}
+body.white .pick.on{background:var(--mustard)}
+body.white #inp{background:#FFFFFF}
+body.white #inp.bad{background:#FBE3DD}
+
 /* ink language */
 .inked{position:relative}
 .inked::after{content:"";position:absolute;inset:-3px;border:3px solid var(--ink);filter:url(#rough);pointer-events:none;border-radius:inherit}
@@ -138,7 +150,7 @@ svg.defs{position:absolute;width:0;height:0}
 #count .burst span{position:relative;font-family:var(--head);font-size:58px;color:var(--brick);-webkit-text-stroke:2px var(--ink);text-shadow:3px 3px 0 var(--ink);transform:rotate(-6deg)}
 #count.pop .burst{animation:popin .32s cubic-bezier(.2,1.6,.4,1)}
 @keyframes popin{from{transform:scale(.3) rotate(-20deg)}to{transform:scale(1) rotate(0)}}
-#text{flex:1;min-height:58px;overflow-y:auto;padding:12px 14px;font-size:20px;line-height:1.55;color:#8F8170;font-weight:600;background:var(--card);-webkit-user-select:none;user-select:none}
+#text{flex:1;min-height:110px;overflow-y:auto;padding:12px 14px;font-size:20px;line-height:1.55;color:#8F8170;font-weight:600;background:var(--card);-webkit-user-select:none;user-select:none}
 #text .done{color:var(--ink)}
 #text .cur{background:linear-gradient(transparent 10%,var(--mustard) 10%,var(--mustard) 90%,transparent 90%);color:var(--ink);padding:0 1px;margin:0 -1px}
 #text .err{background:var(--brick);color:#fff;border-radius:2px}
@@ -258,6 +270,7 @@ const KEY='thumbrally.v1';
 let S={races:0,wins:0,best:0,hist:[],streak:0,lastDay:null,daily:null,recent:[],driver:'thumbs'};
 try{Object.assign(S,JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+if(new URLSearchParams(location.search).get('bg')==='white'){document.body.classList.add('white');document.querySelector('meta[name=theme-color]').content='#FFFFFF'}
 
 const GANG={
   thumbs:{name:'Thumbs'},pops:{name:'Pops Pointer'},birdie:{name:'Birdie'},sir:{name:'Sir Ringsley'},lil:{name:'Lil Pink'}
@@ -290,7 +303,7 @@ function beep(f,d=.06,v=.03,type='sine',delay=0){try{AC=AC||new(window.AudioCont
 const buzz=ms=>{try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}};
 
 const app=$('#app');
-function fitVV(){const vv=window.visualViewport;if(!vv)return;app.style.height=vv.height+'px';app.style.transform=`translateY(${vv.offsetTop}px)`;if(R)layoutTrack()}
+function fitVV(){const vv=window.visualViewport;if(!vv)return;app.style.height=vv.height+'px';app.style.transform=`translateY(${vv.offsetTop}px)`;if(R){layoutTrack();requestAnimationFrame(pinLine)}}
 if(window.visualViewport){visualViewport.addEventListener('resize',fitVV);visualViewport.addEventListener('scroll',fitVV)}
 
 let R=null;const inp=$('#inp');
@@ -316,7 +329,7 @@ function startRace(mode){
 function pickPractice(){let pool=PASS.map((t,i)=>i).filter(i=>!S.recent.includes(i));if(!pool.length)pool=PASS.map((t,i)=>i);const i=pick(pool);S.recent=[i,...S.recent].slice(0,15);save();return PASS[i]}
 let trackFull=300;
 function layoutTrack(){const t=$('#track'),w=t.clientWidth;
-  const vh=(window.visualViewport?visualViewport.height:innerHeight);const laneH=Math.max(34,Math.min(48,Math.floor((vh-250)/5)));
+  const vh=(window.visualViewport?visualViewport.height:innerHeight);const laneH=Math.max(22,Math.min(48,Math.floor((vh-300)/5)));
   t.style.setProperty('--laneH',laneH+'px');if(w>0)trackFull=w;place()}
 function place(){if(!R)return;const T=R.text.length;R.rows.forEach((r,k)=>{const f=r.me?(R.committed+R.good)/T:R.bots[k-1].pos/T;const kw=r.el.offsetWidth||60;r.el.style.transform=`translateX(${Math.min(1,f)*(trackFull-kw-18)}px)`;
   if((r.me?R.state==='done':R.bots[k-1].fin!=null))r.el.classList.remove('run')})}
@@ -338,10 +351,9 @@ $('#text').addEventListener('click',()=>inp.focus());$('#track').addEventListene
 const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
 function renderText(){const t=R.text,p=R.committed,g=R.good,e=R.errNow,cur=R.words[R.wi]||'',end=Math.max(p+cur.length,p+g+e);
   $('#text').innerHTML=`<span class="done">${esc(t.slice(0,p))}</span><span class="cur">${esc(t.slice(p,p+g))}<span class="err">${esc(t.slice(p+g,p+g+e)).replace(/ /g,'&nbsp;')}</span><span class="caret"></span>${esc(t.slice(p+g+e,end))}</span>${esc(t.slice(end))}`;
-  const c=$('#text .caret');if(c){const b=$('#text'),lh=parseFloat(getComputedStyle(b).lineHeight)||31,
-    top=c.getBoundingClientRect().top-b.getBoundingClientRect().top+b.scrollTop-b.clientTop;
-    if(top+lh*2>b.scrollTop+b.clientHeight||top<b.scrollTop)b.scrollTop=Math.max(0,top-lh*.5)}}
-const wpmNow=()=>{const m=R.t/60;return m>.01?Math.round((R.committed+R.good)/5/m):0};
+  pinLine()}
+function pinLine(){const c=$('#text .caret');if(!c)return;const b=$('#text'),top=c.getBoundingClientRect().top-b.getBoundingClientRect().top+b.scrollTop-b.clientTop;
+  const want=Math.max(0,top-12);if(Math.abs(b.scrollTop-want)>2)b.scrollTop=want}const wpmNow=()=>{const m=R.t/60;return m>.01?Math.round((R.committed+R.good)/5/m):0};
 const acc=()=>R.keys?Math.max(0,Math.round(100*(R.keys-R.typos)/R.keys)):100;
 const plc=()=>{const me=R.committed+R.good;let p=1;R.bots.forEach(b=>{if(b.fin!=null||b.pos>me)p++});return p};
 const sfx=n=>['th','st','nd','rd'][n]||'th';
