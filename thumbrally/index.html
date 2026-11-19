@@ -47,6 +47,14 @@ body.white .pick.on{background:var(--mustard)}
 body.white #inp{background:#FFFFFF}
 body.white #inp.bad{background:#FBE3DD}
 
+/* middle ground preview: ?bg=mid (warm off white, light grain, paper only where you race) */
+body.mid{--paper:#FAF5EC;--paper2:#EFE3CB;--card:#FFFDF8;--ink2:#6B5F50}
+body.mid .paper{opacity:.22;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='4' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .3 0 0 0 0 .22 0 0 0 0 .1 0 0 0 .7 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>")}
+body.mid #text{color:#9E907C}
+body.mid #count{background:rgba(250,245,236,.75)}
+body.mid .pick{background:var(--card)}
+body.mid .pick.on{background:var(--mustard)}
+
 /* ink language */
 .inked{position:relative}
 .inked::after{content:"";position:absolute;inset:-3px;border:3px solid var(--ink);filter:url(#rough);pointer-events:none;border-radius:inherit}
@@ -270,7 +278,7 @@ const KEY='thumbrally.v1';
 let S={races:0,wins:0,best:0,hist:[],streak:0,lastDay:null,daily:null,recent:[],driver:'thumbs'};
 try{Object.assign(S,JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
-if(new URLSearchParams(location.search).get('bg')==='white'){document.body.classList.add('white');document.querySelector('meta[name=theme-color]').content='#FFFFFF'}
+{const bg=new URLSearchParams(location.search).get('bg');if(bg==='white'||bg==='mid'){document.body.classList.add(bg);document.querySelector('meta[name=theme-color]').content=bg==='white'?'#FFFFFF':'#FAF5EC'}}
 
 const GANG={
   thumbs:{name:'Thumbs'},pops:{name:'Pops Pointer'},birdie:{name:'Birdie'},sir:{name:'Sir Ringsley'},lil:{name:'Lil Pink'}
