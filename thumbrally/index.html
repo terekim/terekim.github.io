@@ -123,22 +123,22 @@ body.mid .pick.on{background:var(--mustard)}
 .today{display:flex;align-items:center;gap:12px}
 
 /* ---------- race ---------- */
-#race{flex:1;display:flex;flex-direction:column;gap:9px;padding:calc(env(safe-area-inset-top) + 8px) max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));min-height:0}
-#race>.rtop,#race>#track{flex:none}
+#race{flex:1;display:flex;flex-direction:column;gap:7px;padding:calc(env(safe-area-inset-top) + 6px) max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left));min-height:0}
+#race>.rtop,#race>.tbox,#race>#tapkb{flex:none}
 .rtop{display:flex;align-items:center;gap:8px}
-.x{position:relative;width:38px;height:38px;flex:none;background:var(--card);font-weight:800;font-size:16px}
+.x{position:relative;width:32px;height:32px;flex:none;background:var(--card);font-weight:800;font-size:16px}
 .x::after{content:"";position:absolute;inset:-2px;border:2.5px solid var(--ink);filter:url(#rough)}
 .live{flex:1;display:flex;justify-content:space-around;text-align:center}
-.live b{display:block;font-family:var(--head);font-weight:400;font-size:21px;line-height:1.05;font-variant-numeric:tabular-nums}
-.live span{font-size:9.5px;font-weight:800;color:var(--ink2);text-transform:uppercase;letter-spacing:.08em}
-#track{position:relative;background:radial-gradient(rgba(33,28,24,.14) 1px,transparent 1.3px) 0 0/6px 6px,var(--paper2);overflow:hidden}
+.live b{display:block;font-family:var(--head);font-weight:400;font-size:18px;line-height:1.05;font-variant-numeric:tabular-nums}
+.live span{font-size:8.5px;font-weight:800;color:var(--ink2);text-transform:uppercase;letter-spacing:.08em}
+#track{flex:1;min-height:120px;display:flex;flex-direction:column;position:relative;background:radial-gradient(rgba(33,28,24,.14) 1px,transparent 1.3px) 0 0/6px 6px,var(--paper2);overflow:hidden}
 #track::after{content:"";position:absolute;inset:0;border:3px solid var(--ink);filter:url(#rough);pointer-events:none;z-index:3}
-.lane{position:relative;height:var(--laneH,46px);border-bottom:2px dashed rgba(33,28,24,.22)}
+.lane{position:relative;flex:1;min-height:0;border-bottom:2px dashed rgba(33,28,24,.22)}
 .lane:last-child{border-bottom:0}
 .lane .nm{position:absolute;right:22px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:800;color:var(--ink2);text-transform:uppercase;white-space:nowrap;opacity:.8}
 .lane.me{background:rgba(217,169,58,.22)}
 .lane.me .nm{color:var(--ink);opacity:1}
-.kart{position:absolute;left:2px;bottom:-1px;height:calc(var(--laneH,46px) + 8px);will-change:transform;z-index:2}
+.kart{position:absolute;left:2px;bottom:-1px;height:calc(100% + 10px);max-height:84px;will-change:transform;z-index:2}
 .kart img{height:100%;width:auto;transform-origin:30% 90%}
 .kart.run img{animation:bump .14s ease-in-out infinite alternate}
 .kart .puff{position:absolute;left:-6px;bottom:2px;width:14px;height:14px;border-radius:50%;background:#E8D4AE;border:2px solid var(--ink);opacity:0}
@@ -158,16 +158,18 @@ body.mid .pick.on{background:var(--mustard)}
 #count .burst span{position:relative;font-family:var(--head);font-size:58px;color:var(--brick);-webkit-text-stroke:2px var(--ink);text-shadow:3px 3px 0 var(--ink);transform:rotate(-6deg)}
 #count.pop .burst{animation:popin .32s cubic-bezier(.2,1.6,.4,1)}
 @keyframes popin{from{transform:scale(.3) rotate(-20deg)}to{transform:scale(1) rotate(0)}}
-#text{flex:1;min-height:110px;overflow-y:auto;padding:12px 14px;font-size:20px;line-height:1.55;color:#8F8170;font-weight:600;background:var(--card);-webkit-user-select:none;user-select:none}
+#lanes{flex:1;display:flex;flex-direction:column;min-height:0}
+.tbox{position:relative;background:var(--card)}
+.tbox.bad{background:#FBE3DD}
+#text{height:var(--textH,124px);overflow:hidden;padding:9px 14px 0;font-size:20px;line-height:1.55;color:#8F8170;font-weight:600;background:var(--card);-webkit-user-select:none;user-select:none}
+#text::after{content:"";display:block;height:100px}
 #text .done{color:var(--ink)}
 #text .cur{background:linear-gradient(transparent 10%,var(--mustard) 10%,var(--mustard) 90%,transparent 90%);color:var(--ink);padding:0 1px;margin:0 -1px}
 #text .err{background:var(--brick);color:#fff;border-radius:2px}
 #text .caret{display:inline-block;width:2.5px;height:1.05em;background:var(--brick);vertical-align:-2px;margin-right:-2.5px;animation:cb 1s steps(1) infinite}
 @keyframes cb{50%{opacity:0}}
-.inpwrap{flex:none;position:relative}
-#inp{width:100%;font:700 18px var(--hand);padding:13px 14px;color:var(--ink);background:var(--card);border:3px solid var(--ink);border-radius:0;outline:none;box-shadow:3px 4px 0 var(--ink)}
-#inp.bad{background:#F6D4CB}
-.sfx{position:absolute;right:10px;top:-24px;font-family:var(--head);font-size:22px;color:var(--brick);-webkit-text-stroke:1.2px var(--ink);text-shadow:2px 2px 0 var(--ink);transform:rotate(-8deg);opacity:0;pointer-events:none}
+#inp{position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;font-size:16px;border:0;background:transparent;color:transparent;caret-color:transparent;outline:none;-webkit-appearance:none;z-index:1}
+.sfx{position:absolute;right:10px;top:-14px;z-index:2;font-family:var(--head);font-size:22px;color:var(--brick);-webkit-text-stroke:1.2px var(--ink);text-shadow:2px 2px 0 var(--ink);transform:rotate(-8deg);opacity:0;pointer-events:none}
 .sfx.show{animation:sfx .55s ease-out}
 @keyframes sfx{0%{opacity:0;transform:rotate(-8deg) scale(.4)}25%{opacity:1;transform:rotate(-8deg) scale(1.15)}100%{opacity:0;transform:rotate(-8deg) translateY(-10px) scale(1)}}
 #tapkb{flex:none;text-align:center;font-size:12px;font-weight:700;color:var(--ink2)}
@@ -253,8 +255,7 @@ body.mid .pick.on{background:var(--mustard)}
   <div class="rtop"><button class="x" id="bQuit" aria-label="Quit">✕</button>
     <div class="live"><div><b id="lWpm">0</b><span>wpm</span></div><div><b id="lPlace">–</b><span>place</span></div><div><b id="lAcc">100</b><span>acc</span></div><div><b id="lTime">0.0</b><span>sec</span></div></div></div>
   <div id="track"><div class="fin"></div><div id="lanes"></div><div id="count"><div class="burst"><svg viewBox="0 0 100 100"><path d="M50 2 L59 30 L88 18 L72 42 L98 52 L70 60 L84 88 L56 72 L48 98 L40 72 L14 86 L28 60 L2 50 L28 40 L14 14 L42 28Z" fill="#D9A93A" stroke="#211C18" stroke-width="3" stroke-linejoin="round"/></svg><span id="countN">3</span></div></div></div>
-  <div id="text" class="inked"></div>
-  <div class="inpwrap"><input id="inp" type="text" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="go" placeholder="start typing…" aria-label="Type the passage here"><span class="sfx" id="sfx">Sputter!</span></div>
+  <div class="tbox inked" id="tbox"><div id="text"></div><input id="inp" type="text" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="go" aria-label="Type the passage here"><span class="sfx" id="sfx">Sputter!</span></div>
   <div id="tapkb" class="hidden">Keyboard closed? Tap the box.</div>
 </section>
 </div>
@@ -325,7 +326,7 @@ function startRace(mode){
   const rows=[{id:me,name:'You',me:true},...bots.map(b=>({id:b.id,name:GANG[b.id].name}))];
   rows.forEach(r=>{const l=document.createElement('div');l.className='lane'+(r.me?' me':'');
     l.innerHTML=`<span class="nm">${r.name}</span><div class="kart"><i class="puff"></i><i class="puff p2"></i><i class="smoke"></i><img src="${kartSrc(r.id)}" alt="${GANG[r.id].name}"></div>`;lanes.appendChild(l);r.el=l.querySelector('.kart')});
-  R.rows=rows;inp.value='';inp.classList.remove('bad');
+  R.rows=rows;inp.value='';$('#tbox').classList.remove('bad');
   $('#res').classList.remove('show');$('#home').classList.add('hidden');$('#race').classList.remove('hidden');
   renderText();live();layoutTrack();inp.focus({preventScroll:true});
   const c=$('#count'),cn=$('#countN');c.classList.remove('hidden');let n=3;
@@ -336,9 +337,8 @@ function startRace(mode){
 }
 function pickPractice(){let pool=PASS.map((t,i)=>i).filter(i=>!S.recent.includes(i));if(!pool.length)pool=PASS.map((t,i)=>i);const i=pick(pool);S.recent=[i,...S.recent].slice(0,15);save();return PASS[i]}
 let trackFull=300;
-function layoutTrack(){const t=$('#track'),w=t.clientWidth;
-  const vh=(window.visualViewport?visualViewport.height:innerHeight);const laneH=Math.max(22,Math.min(48,Math.floor((vh-300)/5)));
-  t.style.setProperty('--laneH',laneH+'px');if(w>0)trackFull=w;place()}
+function layoutTrack(){const t=$('#track'),w=t.clientWidth;const vh=(window.visualViewport?visualViewport.height:innerHeight);
+  const lines=vh<560?2:3;$('#text').style.setProperty('--textH',Math.round(lines*31+13)+'px');if(w>0)trackFull=w;place()}
 function place(){if(!R)return;const T=R.text.length;R.rows.forEach((r,k)=>{const f=r.me?(R.committed+R.good)/T:R.bots[k-1].pos/T;const kw=r.el.offsetWidth||60;r.el.style.transform=`translateX(${Math.min(1,f)*(trackFull-kw-18)}px)`;
   if((r.me?R.state==='done':R.bots[k-1].fin!=null))r.el.classList.remove('run')})}
 function sputter(){const el=R.rows[0].el;el.classList.remove('sputter');void el.offsetWidth;el.classList.add('sputter');const s=$('#sfx');s.textContent=pick(['Sputter!','Clunk!','Oops!','Bonk!']);s.classList.remove('show');void s.offsetWidth;s.classList.add('show')}
@@ -350,7 +350,7 @@ inp.addEventListener('input',e=>{
   if(inp.value!==v)inp.value=v;
   const tg=R.words[R.wi]+(R.wi===R.words.length-1?'':' ');let k=0;while(k<v.length&&k<tg.length&&v[k]===tg[k])k++;
   R.good=k;R.errNow=v.length-k;if(R.errNow>before){R.typos+=R.errNow-before;beep(150,.09,.04,'triangle');buzz(25);sputter()}
-  inp.classList.toggle('bad',R.errNow>0);renderText();
+  $('#tbox').classList.toggle('bad',R.errNow>0);renderText();
 });
 inp.addEventListener('keydown',e=>{if(e.key==='Enter')e.preventDefault()});
 inp.addEventListener('blur',()=>{if(R&&R.state!=='done'&&!$('#race').classList.contains('hidden'))$('#tapkb').classList.remove('hidden')});
@@ -361,7 +361,7 @@ function renderText(){const t=R.text,p=R.committed,g=R.good,e=R.errNow,cur=R.wor
   $('#text').innerHTML=`<span class="done">${esc(t.slice(0,p))}</span><span class="cur">${esc(t.slice(p,p+g))}<span class="err">${esc(t.slice(p+g,p+g+e)).replace(/ /g,'&nbsp;')}</span><span class="caret"></span>${esc(t.slice(p+g+e,end))}</span>${esc(t.slice(end))}`;
   pinLine()}
 function pinLine(){const c=$('#text .caret');if(!c)return;const b=$('#text'),top=c.getBoundingClientRect().top-b.getBoundingClientRect().top+b.scrollTop-b.clientTop;
-  const want=Math.max(0,top-12);if(Math.abs(b.scrollTop-want)>2)b.scrollTop=want}const wpmNow=()=>{const m=R.t/60;return m>.01?Math.round((R.committed+R.good)/5/m):0};
+  const want=Math.max(0,top-9);if(Math.abs(b.scrollTop-want)>2)b.scrollTop=want}const wpmNow=()=>{const m=R.t/60;return m>.01?Math.round((R.committed+R.good)/5/m):0};
 const acc=()=>R.keys?Math.max(0,Math.round(100*(R.keys-R.typos)/R.keys)):100;
 const plc=()=>{const me=R.committed+R.good;let p=1;R.bots.forEach(b=>{if(b.fin!=null||b.pos>me)p++});return p};
 const sfx=n=>['th','st','nd','rd'][n]||'th';
